@@ -32,7 +32,10 @@ extension ViewController: UITextViewDelegate {
                 textView.insertText("\n\t\n}")
                 cursorOffset = 2
                 inputHasBeenModified = true
+            } else if previousText == "}" {
+                // indentation level of the }
             }
+            // TODO: Deal with indentation levels
         case "(":
             textView.insertText("()")
             cursorOffset = 1
@@ -42,17 +45,17 @@ extension ViewController: UITextViewDelegate {
             cursorOffset = 1
             inputHasBeenModified = true
         case ")":
-            if textAtCursorPosition(in: textView, offset: 1) == ")" {
+            if textAtCursorPosition(in: textView) == ")" {
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
         case "]":
-            if textAtCursorPosition(in: textView, offset: 1) == "]" {
+            if textAtCursorPosition(in: textView) == "]" {
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
         case "}":
-            if textAtCursorPosition(in: textView, offset: 1) == "}" {
+            if textAtCursorPosition(in: textView) == "}" {
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
@@ -71,8 +74,14 @@ extension ViewController: UITextViewDelegate {
     private func textAtCursorPosition(in textView: UITextView, offset: Int = 0) -> String {
         guard let currentPosition = textView.selectedTextRange?.start,
             let newPosition = textView.position(from: currentPosition, offset: offset),
-            let previousRange = textView.textRange(from: currentPosition, to: newPosition),
-            let text = textView.text(in: previousRange) else { return "" }
+            let positionAfterNextCharacter = textView.position(from: newPosition, offset: 1),
+            let range = textView.textRange(from: newPosition, to: positionAfterNextCharacter),
+            let text = textView.text(in: range) else { return "" }
         return text
+    }
+    
+    private var indentationLevel: Int {
+        // TODO: find out intentation level of the current line
+        return 0
     }
 }
