@@ -22,7 +22,8 @@ extension ViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         guard let cursorPosition = textView.selectedTextRange?.start else { return true }
-        let previousText = textAtCursorPosition(in: textView, offset: -1)
+        //Also possible (which one is better? otherwise I never use range): guard let cursorPosition = textView.position(from: textView.beginningOfDocument, offset: range.location) else { return true }
+        let previousText = characterAfterCursorPosition(in: textView, offset: -1)
         var inputHasBeenModified = false
         var cursorOffset = 0
         
@@ -45,17 +46,24 @@ extension ViewController: UITextViewDelegate {
             cursorOffset = 1
             inputHasBeenModified = true
         case ")":
-            if textAtCursorPosition(in: textView) == ")" {
+            if characterAfterCursorPosition(in: textView) == ")" {
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
         case "]":
-            if textAtCursorPosition(in: textView) == "]" {
+            if characterAfterCursorPosition(in: textView) == "]" {
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
         case "}":
-            if textAtCursorPosition(in: textView) == "}" {
+            if characterAfterCursorPosition(in: textView) == "}" {
+                cursorOffset = 1
+                inputHasBeenModified = true
+            }
+        case "\"":
+            let occurrences = number(of: "\"", in: textView)
+            if (occurrences % 2) == 0 {
+                textView.insertText("\"\"")
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
@@ -71,17 +79,53 @@ extension ViewController: UITextViewDelegate {
         return !inputHasBeenModified
     }
     
-    private func textAtCursorPosition(in textView: UITextView, offset: Int = 0) -> String {
+    // MARK: - Helpers
+    private func characterAfterCursorPosition(in textView: UITextView, offset: Int = 0) -> String {
         guard let currentPosition = textView.selectedTextRange?.start,
             let newPosition = textView.position(from: currentPosition, offset: offset),
             let positionAfterNextCharacter = textView.position(from: newPosition, offset: 1),
             let range = textView.textRange(from: newPosition, to: positionAfterNextCharacter),
-            let text = textView.text(in: range) else { return "" }
-        return text
+            let character = textView.text(in: range) else { return "" }
+        return character
     }
     
-    private var indentationLevel: Int {
+    private func indentationLevel() -> Int {
         // TODO: find out intentation level of the current line
         return 0
+    }
+    
+    private func number(of string: String, in textView: UITextView) -> Int {
+        guard let range = textView.textRange(from: textView.beginningOfDocument, to: textView.endOfDocument),
+            let text = textView.text(in: range) else { return 0 }
+        let split =  text.components(separatedBy: string)
+        return split.count-1
+    }
+    
+    private func number(ofPreceding string: String, in textView: UITextView) -> Int {
+        guard let currentPosition = textView.selectedTextRange?.start,
+            let range = textView.textRange(from: textView.beginningOfDocument, to: currentPosition),
+            let text = textView.text(in: range) else { return 0 }
+        let split =  text.components(separatedBy: string)
+        return split.count-1
+    }
+    
+    private func number(ofFollowing string: String, in textView: UITextView) -> Int {
+        guard let currentPosition = textView.selectedTextRange?.start,
+            let range = textView.textRange(from: textView.endOfDocument, to: currentPosition),
+            let text = textView.text(in: range) else { return 0 }
+        let split =  text.components(separatedBy: string)
+        return split.count-1
+    }
+    
+    private func difference(betweenPreceding string1: String, toPreceding string2: String, in textView: UITextView) -> Int {
+        let number1 = number(ofPreceding: string1, in: textView)
+        let number2 = number(ofPreceding: string2, in: textView)
+        return number1 - number2
+    }
+    
+    private func difference(betweenFollowing string1: String, toPreceding string2: String, in textView: UITextView) -> Int {
+        let number1 = number(ofFollowing: string1, in: textView)
+        let number2 = number(ofFollowing: string2, in: textView)
+        return number1 - number2
     }
 }
