@@ -30,7 +30,11 @@ extension ViewController: UITextViewDelegate {
         case "\n":
             let precedingCharacter = characterAfterCursorPosition(in: textView, offset: -1)
             if precedingCharacter == "{" {
-                textView.insertText("\n\t\n}")
+                if difference(between: "{", and: "}", in: textView) > 0 {
+                    textView.insertText("\n\t\n}")
+                } else {
+                    textView.insertText("\n\t\n")
+                }
                 cursorOffset = 2
                 inputHasBeenModified = true
             } else if precedingCharacter == "}" {
@@ -38,27 +42,43 @@ extension ViewController: UITextViewDelegate {
             }
             // TODO: Deal with indentation levels
         case "(":
-            textView.insertText("()")
-            cursorOffset = 1
-            inputHasBeenModified = true
-        case "[":
-            textView.insertText("[]")
-            cursorOffset = 1
-            inputHasBeenModified = true
-        case ")":
-            if characterAfterCursorPosition(in: textView) == ")" {
+            if difference(between: "(", and: ")", in: textView) >= 0 {
+                textView.insertText("()")
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
-        case "]":
-            if characterAfterCursorPosition(in: textView) == "]" {
+        case "[":
+            if difference(between: "[", and: "]", in: textView) >= 0 {
+                textView.insertText("[]")
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
         case "}":
-            if characterAfterCursorPosition(in: textView) == "}" {
+            if characterAfterCursorPosition(in: textView) == "}"
+                && difference(between: "{", and: "}", in: textView) <= 0 {
                 cursorOffset = 1
                 inputHasBeenModified = true
+            } else if difference(between: "{", and: "}", in: textView) <= 0 {
+                // TODO: play warning sound
+                print("too many }s")
+            }
+        case ")":
+            if characterAfterCursorPosition(in: textView) == ")"
+                && difference(between: "(", and: ")", in: textView) <= 0 {
+                cursorOffset = 1
+                inputHasBeenModified = true
+            } else if difference(between: "(", and: ")", in: textView) <= 0 {
+                // TODO: play warning sound
+                print("too many )s")
+            }
+        case "]":
+            if characterAfterCursorPosition(in: textView) == "]"
+                && difference(between: "[", and: "]", in: textView) <= 0 {
+                cursorOffset = 1
+                inputHasBeenModified = true
+            } else if difference(between: "[", and: "]", in: textView) <= 0 {
+                // TODO: play warning sound
+                print("too many ]s")
             }
         case "\"":
             let occurrences = number(of: "\"", in: textView)
@@ -115,19 +135,25 @@ extension ViewController: UITextViewDelegate {
     
     private func number(ofFollowing string: String, in textView: UITextView) -> Int {
         guard let currentPosition = textView.selectedTextRange?.start,
-            let range = textView.textRange(from: textView.endOfDocument, to: currentPosition),
+            let range = textView.textRange(from: currentPosition, to: textView.endOfDocument),
             let text = textView.text(in: range) else { return 0 }
         let split =  text.components(separatedBy: string)
         return split.count-1
     }
     
-    private func difference(betweenPreceding string1: String, toPreceding string2: String, in textView: UITextView) -> Int {
+    private func difference(between string1: String, and string2: String, in textView: UITextView) -> Int {
+        let number1 = number(of: string1, in: textView)
+        let number2 = number(of: string2, in: textView)
+        return number1 - number2
+    }
+    
+    private func difference(betweenPreceding string1: String, andPreceding string2: String, in textView: UITextView) -> Int {
         let number1 = number(ofPreceding: string1, in: textView)
         let number2 = number(ofPreceding: string2, in: textView)
         return number1 - number2
     }
     
-    private func difference(betweenFollowing string1: String, toPreceding string2: String, in textView: UITextView) -> Int {
+    private func difference(betweenFollowing string1: String, andFollowing string2: String, in textView: UITextView) -> Int {
         let number1 = number(ofFollowing: string1, in: textView)
         let number2 = number(ofFollowing: string2, in: textView)
         return number1 - number2
