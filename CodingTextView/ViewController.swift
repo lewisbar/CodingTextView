@@ -62,9 +62,8 @@ extension ViewController: UITextViewDelegate {
             }
         case "\"":
             let occurrences = number(of: "\"", in: textView)
-            let followingCharacter = characterAfterCursorPosition(in: textView)
             guard (occurrences % 2) == 0 else { return true }
-            if followingCharacter == "\"" {
+            if characterAfterCursorPosition(in: textView) == "\"" {
                 cursorOffset = 1
                 inputHasBeenModified = true
             } else {
