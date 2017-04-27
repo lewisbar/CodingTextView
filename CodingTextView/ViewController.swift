@@ -23,17 +23,17 @@ extension ViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         guard let cursorPosition = textView.selectedTextRange?.start else { return true }
         //Also possible (which one is better? otherwise I never use range): guard let cursorPosition = textView.position(from: textView.beginningOfDocument, offset: range.location) else { return true }
-        let previousText = characterAfterCursorPosition(in: textView, offset: -1)
         var inputHasBeenModified = false
         var cursorOffset = 0
         
         switch text {
         case "\n":
-            if previousText == "{" {
+            let precedingCharacter = characterAfterCursorPosition(in: textView, offset: -1)
+            if precedingCharacter == "{" {
                 textView.insertText("\n\t\n}")
                 cursorOffset = 2
                 inputHasBeenModified = true
-            } else if previousText == "}" {
+            } else if precedingCharacter == "}" {
                 // indentation level of the }
             }
             // TODO: Deal with indentation levels
@@ -62,7 +62,12 @@ extension ViewController: UITextViewDelegate {
             }
         case "\"":
             let occurrences = number(of: "\"", in: textView)
-            if (occurrences % 2) == 0 {
+            let followingCharacter = characterAfterCursorPosition(in: textView)
+            guard (occurrences % 2) == 0 else { return true }
+            if followingCharacter == "\"" {
+                cursorOffset = 1
+                inputHasBeenModified = true
+            } else {
                 textView.insertText("\"\"")
                 cursorOffset = 1
                 inputHasBeenModified = true
