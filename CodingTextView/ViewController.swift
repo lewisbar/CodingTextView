@@ -101,39 +101,41 @@ extension ViewController: UITextViewDelegate {
         return split.count-1
     }
     
-    private func number(ofPreceding string: String, in textView: UITextView) -> Int {
-        guard let currentPosition = textView.selectedTextRange?.start,
-            let range = textView.textRange(from: textView.beginningOfDocument, to: currentPosition),
-            let text = textView.text(in: range) else { return 0 }
-        let split =  text.components(separatedBy: string)
-        return split.count-1
-    }
-    
-    private func number(ofFollowing string: String, in textView: UITextView) -> Int {
-        guard let currentPosition = textView.selectedTextRange?.start,
-            let range = textView.textRange(from: currentPosition, to: textView.endOfDocument),
-            let text = textView.text(in: range) else { return 0 }
-        let split =  text.components(separatedBy: string)
-        return split.count-1
-    }
-    
     private func difference(between string1: String, and string2: String, in textView: UITextView) -> Int {
         let number1 = number(of: string1, in: textView)
         let number2 = number(of: string2, in: textView)
         return number1 - number2
     }
-    
-    private func difference(betweenPreceding string1: String, andPreceding string2: String, in textView: UITextView) -> Int {
-        let number1 = number(ofPreceding: string1, in: textView)
-        let number2 = number(ofPreceding: string2, in: textView)
-        return number1 - number2
-    }
-    
-    private func difference(betweenFollowing string1: String, andFollowing string2: String, in textView: UITextView) -> Int {
-        let number1 = number(ofFollowing: string1, in: textView)
-        let number2 = number(ofFollowing: string2, in: textView)
-        return number1 - number2
-    }
+
+//
+//    private func number(ofPreceding string: String, in textView: UITextView) -> Int {
+//        guard let currentPosition = textView.selectedTextRange?.start,
+//            let range = textView.textRange(from: textView.beginningOfDocument, to: currentPosition),
+//            let text = textView.text(in: range) else { return 0 }
+//        let split =  text.components(separatedBy: string)
+//        return split.count-1
+//    }
+//    
+//    private func number(ofFollowing string: String, in textView: UITextView) -> Int {
+//        guard let currentPosition = textView.selectedTextRange?.start,
+//            let range = textView.textRange(from: currentPosition, to: textView.endOfDocument),
+//            let text = textView.text(in: range) else { return 0 }
+//        let split =  text.components(separatedBy: string)
+//        return split.count-1
+//    }
+//    
+//
+//    private func difference(betweenPreceding string1: String, andPreceding string2: String, in textView: UITextView) -> Int {
+//        let number1 = number(ofPreceding: string1, in: textView)
+//        let number2 = number(ofPreceding: string2, in: textView)
+//        return number1 - number2
+//    }
+//    
+//    private func difference(betweenFollowing string1: String, andFollowing string2: String, in textView: UITextView) -> Int {
+//        let number1 = number(ofFollowing: string1, in: textView)
+//        let number2 = number(ofFollowing: string2, in: textView)
+//        return number1 - number2
+//    }
 }
 
 private extension String {
