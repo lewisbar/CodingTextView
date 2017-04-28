@@ -30,7 +30,7 @@ extension ViewController: UITextViewDelegate {
         case "\n":
             let precedingCharacter = characterAfterCursorPosition(in: textView, offset: -1)
             if precedingCharacter == "{" {
-                if difference(between: "{", and: "}", in: textView) > 0 {
+                if difference(between: precedingCharacter, and: precedingCharacter.counterpart, in: textView) > 0 {
                     textView.insertText("\n\t\n}")
                 } else {
                     textView.insertText("\n\t\n")
@@ -41,53 +41,29 @@ extension ViewController: UITextViewDelegate {
                 // indentation level of the }
             }
             // TODO: Deal with indentation levels
-        case "(":
-            if difference(between: "(", and: ")", in: textView) >= 0 {
-                textView.insertText("()")
+        case "(", "[":
+            if difference(between: text, and: text.counterpart, in: textView) >= 0 {
+                textView.insertText(text + text.counterpart)
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
-        case "[":
-            if difference(between: "[", and: "]", in: textView) >= 0 {
-                textView.insertText("[]")
+        case "}", ")", "]":
+            if characterAfterCursorPosition(in: textView) == text
+                && difference(between: text.counterpart, and: text, in: textView) <= 0 {
                 cursorOffset = 1
                 inputHasBeenModified = true
-            }
-        case "}":
-            if characterAfterCursorPosition(in: textView) == "}"
-                && difference(between: "{", and: "}", in: textView) <= 0 {
-                cursorOffset = 1
-                inputHasBeenModified = true
-            } else if difference(between: "{", and: "}", in: textView) <= 0 {
+            } else if difference(between: text.counterpart, and: text, in: textView) <= 0 {
                 // TODO: play warning sound
-                print("too many }s")
-            }
-        case ")":
-            if characterAfterCursorPosition(in: textView) == ")"
-                && difference(between: "(", and: ")", in: textView) <= 0 {
-                cursorOffset = 1
-                inputHasBeenModified = true
-            } else if difference(between: "(", and: ")", in: textView) <= 0 {
-                // TODO: play warning sound
-                print("too many )s")
-            }
-        case "]":
-            if characterAfterCursorPosition(in: textView) == "]"
-                && difference(between: "[", and: "]", in: textView) <= 0 {
-                cursorOffset = 1
-                inputHasBeenModified = true
-            } else if difference(between: "[", and: "]", in: textView) <= 0 {
-                // TODO: play warning sound
-                print("too many ]s")
+                print("too many closed brackets")
             }
         case "\"":
-            let occurrences = number(of: "\"", in: textView)
+            let occurrences = number(of: text, in: textView)
             guard (occurrences % 2) == 0 else { return true }
-            if characterAfterCursorPosition(in: textView) == "\"" {
+            if characterAfterCursorPosition(in: textView) == text {
                 cursorOffset = 1
                 inputHasBeenModified = true
             } else {
-                textView.insertText("\"\"")
+                textView.insertText(text + text)
                 cursorOffset = 1
                 inputHasBeenModified = true
             }
@@ -157,5 +133,19 @@ extension ViewController: UITextViewDelegate {
         let number1 = number(ofFollowing: string1, in: textView)
         let number2 = number(ofFollowing: string2, in: textView)
         return number1 - number2
+    }
+}
+
+private extension String {
+    var counterpart: String {
+        switch self {
+        case "(": return ")"
+        case ")": return "("
+        case "[": return "]"
+        case "]": return "["
+        case "{": return "}"
+        case "}": return "{"
+        default: return ""
+        }
     }
 }
