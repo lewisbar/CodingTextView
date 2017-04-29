@@ -36,7 +36,7 @@ extension ViewController: UITextViewDelegate {
             textToInsert += indentation(level: indentationLevel)
             cursorOffset += indentationLevel
             if previousCharacter == "{",
-                difference(between: previousCharacter, and: previousCharacter.counterpart, in: textView) > 0 {
+                difference(between: previousCharacter, and: previousCharacter.counterpart, in: textView) > 0 { //TODO: Except when "switch" is in the same line before that
                 textToInsert += "\t\n"
                 cursorOffset += 1
                 textToInsert += indentation(level: indentationLevel)
