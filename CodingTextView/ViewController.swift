@@ -21,6 +21,8 @@ class ViewController: UIViewController {
 extension ViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        print("Before:", characterBeforeCursorPosition(in: textView))
+        print("After:", characterAfterCursorPosition(in: textView))
         guard let cursorPosition = textView.selectedTextRange?.start else { return true }
         //Also possible (which one is better? otherwise I never use range): guard let cursorPosition = textView.position(from: textView.beginningOfDocument, offset: range.location) else { return true }
         var inputHasBeenModified = false
@@ -28,26 +30,22 @@ extension ViewController: UITextViewDelegate {
         
         switch text {
         case "\n":
-            let precedingCharacter = characterAfterCursorPosition(in: textView, offset: -1)
-            if precedingCharacter == "{" {
-                if difference(between: precedingCharacter, and: precedingCharacter.counterpart, in: textView) > 0 {
-                    textView.insertText("\n\t\n}")
-                } else {
-                    textView.insertText("\n\t\n")
-                }
-                cursorOffset = 2
-                inputHasBeenModified = true
-            } else if precedingCharacter == "}" {
-                // indentation level of the }
-                let indentation = currentIndentationLevel(in: textView)
-                textView.insertText("\n")
-                for _ in 0...indentation {
-                    textView.insertText("\t")
-                }
-                cursorOffset = indentation + 1
-                inputHasBeenModified = true
+            let previousCharacter = characterBeforeCursorPosition(in: textView)
+            let indentationLevel = currentIndentationLevel(in: textView)
+            var textToInsert = "\n"
+            cursorOffset = 1
+            inputHasBeenModified = true
+            textToInsert += indentation(level: indentationLevel)
+            cursorOffset += indentationLevel
+            if previousCharacter == "{",
+                difference(between: previousCharacter, and: previousCharacter.counterpart, in: textView) > 0 {
+                textToInsert += "\t\n"
+                cursorOffset += 1
+                textToInsert += indentation(level: indentationLevel)
+                cursorOffset += indentationLevel
+                textToInsert += "}"
             }
-            // TODO: Deal with indentation levels
+            textView.insertText(textToInsert)
         case "(", "[":
             if difference(between: text, and: text.counterpart, in: textView) >= 0 {
                 textView.insertText(text + text.counterpart)
@@ -87,10 +85,16 @@ extension ViewController: UITextViewDelegate {
     }
     
     // MARK: - Helpers
-    private func characterAfterCursorPosition(in textView: UITextView, offset: Int = 0) -> String {
+    private func characterAfterCursorPosition(in textView: UITextView) -> String {
         guard let currentPosition = textView.selectedTextRange?.start,
-            let newPosition = textView.position(from: currentPosition, offset: offset),
-            let range = textView.characterRange(byExtending: newPosition, in: UITextLayoutDirection.right),
+            let range = textView.characterRange(byExtending: currentPosition, in: UITextLayoutDirection.right),
+            let character = textView.text(in: range) else { return "" }
+        return character
+    }
+    
+    private func characterBeforeCursorPosition(in textView: UITextView) -> String {
+        guard let currentPosition = textView.selectedTextRange?.start,
+            let range = textView.characterRange(byExtending: currentPosition, in: UITextLayoutDirection.left),
             let character = textView.text(in: range) else { return "" }
         return character
     }
@@ -133,8 +137,15 @@ extension ViewController: UITextViewDelegate {
             if nextCharacter == "\t" { indentationLevel += 1; offset += 1 }
             else { break }
         }
-
+        
         return indentationLevel
+    }
+    
+    private func indentation(level: Int) -> String {
+        var indentation = ""
+        var i = level
+        while i > 0 { indentation += "\t"; i -= 1 }
+        return indentation
     }
     
     private func number(of string: String, in textView: UITextView) -> Int {
