@@ -28,7 +28,7 @@ extension ViewController: UITextViewDelegate {
         
         switch text {
         case "\n":
-            let previousCharacter = characterBeforeCursorPosition(in: textView)
+            let previousCharacter = textView.characterBefore(cursorPosition) //characterBeforeCursorPosition(in: textView)
             let indentationLevel = currentIndentationLevel(in: textView)
             var textToInsert = "\n"
             cursorOffset = 1
@@ -189,6 +189,56 @@ extension ViewController: UITextViewDelegate {
 //        let number2 = number(ofFollowing: string2, in: textView)
 //        return number1 - number2
 //    }
+}
+
+private extension UITextView {
+    var line: UITextRange? {
+        let newLine = "\n"
+        guard let start = positionAfterPrevious(newLine),
+            let end = positionBeforeNext(newLine) else { return nil }
+        return textRange(from: start, to: end)
+    }
+    
+    func characterBefore(_ position: UITextPosition) -> String {
+        guard let range = characterRange(byExtending: position, in: UITextLayoutDirection.left),
+            let character = text(in: range) else { return "" }
+        return character
+    }
+    
+    private func characterAfter(_ position: UITextPosition) -> String {
+        guard let range = characterRange(byExtending: position, in: UITextLayoutDirection.right),
+            let character = text(in: range) else { return "" }
+        return character
+    }
+    
+    func positionAfterPrevious(_ string: String) -> UITextPosition? {
+        guard let cursorPosition = selectedTextRange?.start else { return nil }
+        var previousCharacter: String?
+        var offset = -1
+        var position = UITextPosition()
+        while previousCharacter != string {
+            guard let currentPosition = self.position(from: cursorPosition, offset: offset) else { return nil }
+            position = currentPosition
+            previousCharacter = characterBefore(currentPosition)
+            offset -= 1
+        }
+        return position
+    }
+    
+    func positionBeforeNext(_ string: String) -> UITextPosition? {
+        guard let cursorPosition = selectedTextRange?.start else { return nil }
+        var nextCharacter: String?
+        var offset = 1
+        var position = UITextPosition()
+        while nextCharacter != string {
+            guard let currentPosition = self.position(from: cursorPosition, offset: offset) else { return nil }
+            position = currentPosition
+            nextCharacter = characterAfter(currentPosition)
+            offset += 1
+        }
+        return position
+    }
+
 }
 
 private extension String {
