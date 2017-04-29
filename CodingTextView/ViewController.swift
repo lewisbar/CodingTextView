@@ -21,8 +21,6 @@ class ViewController: UIViewController {
 extension ViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        print("Before:", characterBeforeCursorPosition(in: textView))
-        print("After:", characterAfterCursorPosition(in: textView))
         guard let cursorPosition = textView.selectedTextRange?.start else { return true }
         //Also possible (which one is better? otherwise I never use range): guard let cursorPosition = textView.position(from: textView.beginningOfDocument, offset: range.location) else { return true }
         var inputHasBeenModified = false
