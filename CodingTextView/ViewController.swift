@@ -83,6 +83,7 @@ extension ViewController: UITextViewDelegate {
     }
     
     // MARK: - Helpers
+    //TODO: Refactor most of this into an extension UITextView
     private func characterAfterCursorPosition(in textView: UITextView) -> String {
         guard let currentPosition = textView.selectedTextRange?.start,
             let range = textView.characterRange(byExtending: currentPosition, in: UITextLayoutDirection.right),
