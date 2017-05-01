@@ -37,7 +37,7 @@ extension ViewController: UITextViewDelegate {
             textView.newLine()
             textView.indentCurrentLine(indentationLevel)
             if previousCharacter == "{" {
-                if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine(); print("no switch") }
+                if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine()}
                 if textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 {
                     textView.newLine()
                     textView.indentCurrentLine(indentationLevel)
