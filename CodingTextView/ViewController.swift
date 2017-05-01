@@ -31,13 +31,12 @@ extension ViewController: UITextViewDelegate {
         case "\n":
             // TODO: If first part of line contains "case", that line's indentation should be adapted to its switches indentation
             // TODO: If you type "{}", then put the cursor between the braces and hit enter, the result is not good
+            guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
             let previousCharacter = textView.characterBefore(cursorPosition)
             let indentationLevel = textView.currentIndentationLevel
             textView.newLine()
             textView.indentCurrentLine(indentationLevel)
             if previousCharacter == "{" {
-                guard let firstPartOfLine = textView.lineFromStartToCursor else { return false }
-                // TODO: Why is the code in the closure executed when there is a "switch"? Answer: Wrong Line!
                 if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine(); print("no switch") }
                 if textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 {
                     textView.newLine()
