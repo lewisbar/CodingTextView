@@ -37,7 +37,7 @@ extension ViewController: UITextViewDelegate {
             textView.indentCurrentLine(indentationLevel)
             if previousCharacter == "{" {
                 guard let firstPartOfLine = textView.lineFromStartToCursor else { return false }
-                // TODO: Why is the code in the closure executed when there is a "switch"?
+                // TODO: Why is the code in the closure executed when there is a "switch"? Answer: Wrong Line!
                 if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine(); print("no switch") }
                 if textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 {
                     textView.newLine()
