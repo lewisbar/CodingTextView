@@ -22,181 +22,101 @@ extension ViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         guard let cursorPosition = textView.selectedTextRange?.start else { return true }
-        //Also possible (which one is better? otherwise I never use range): guard let cursorPosition = textView.position(from: textView.beginningOfDocument, offset: range.location) else { return true }
         var inputHasBeenModified = false
-        var cursorOffset = 0
         
         switch text {
-        case "\n":
-            let previousCharacter = textView.characterBefore(cursorPosition) //characterBeforeCursorPosition(in: textView)
-            let indentationLevel = currentIndentationLevel(in: textView)
-            var textToInsert = "\n"
-            cursorOffset = 1
+        case ".":   // test case
+            print(textView.range(textView.lineFromStartToCursor!, contains: "switch"))
             inputHasBeenModified = true
-            textToInsert += indentation(level: indentationLevel)
-            cursorOffset += indentationLevel
-            if previousCharacter == "{",
-                difference(between: previousCharacter, and: previousCharacter.counterpart, in: textView) > 0 { //TODO: Except when "switch" is in the same line before that
-                textToInsert += "\t\n"
-                cursorOffset += 1
-                textToInsert += indentation(level: indentationLevel)
-                cursorOffset += indentationLevel
-                textToInsert += "}"
+        case "\n":
+            // TODO: If first part of line contains "case", that line's indentation should be adapted to its switches indentation
+            // TODO: If you type "{}", then put the cursor between the braces and hit enter, the result is not good
+            let previousCharacter = textView.characterBefore(cursorPosition)
+            let indentationLevel = textView.currentIndentationLevel
+            textView.newLine()
+            textView.indentCurrentLine(indentationLevel)
+            if previousCharacter == "{" {
+                guard let firstPartOfLine = textView.lineFromStartToCursor else { return false }
+                // TODO: Why is the code in the closure executed when there is a "switch"?
+                if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine(); print("no switch") }
+                if textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 {
+                    textView.newLine()
+                    textView.indentCurrentLine(indentationLevel)
+                    textView.insertText("}")
+                    textView.moveCursor(-(Int(indentationLevel)+2))
+                }
             }
-            textView.insertText(textToInsert)
+            inputHasBeenModified = true
         case "(", "[":
-            if difference(between: text, and: text.counterpart, in: textView) >= 0 {
+            if textView.number(of: text) - textView.number(of: text.counterpart) >= 0 {
                 textView.insertText(text + text.counterpart)
-                cursorOffset = 1
+                textView.moveCursor(-1)
                 inputHasBeenModified = true
             }
         case "}", ")", "]":
-            if characterAfterCursorPosition(in: textView) == text
-                && difference(between: text.counterpart, and: text, in: textView) <= 0 {
-                cursorOffset = 1
+            if textView.characterAfter(cursorPosition) == text
+                && textView.number(of: text) - textView.number(of: text.counterpart) >= 0 {
+                textView.moveCursor()
                 inputHasBeenModified = true
-            } else if difference(between: text.counterpart, and: text, in: textView) <= 0 {
+            } else if textView.number(of: text) - textView.number(of: text.counterpart) >= 0 {
                 // TODO: play warning sound
                 print("too many closed brackets")
             }
         case "\"":
-            let occurrences = number(of: text, in: textView)
+            let occurrences = textView.number(of: text)
             guard (occurrences % 2) == 0 else { return true }
-            if characterAfterCursorPosition(in: textView) == text {
-                cursorOffset = 1
+            if textView.characterAfter(cursorPosition) == text {
+                textView.moveCursor()
                 inputHasBeenModified = true
             } else {
                 textView.insertText(text + text)
-                cursorOffset = 1
+                textView.moveCursor(-1)
                 inputHasBeenModified = true
             }
         default:
             return true
         }
         
-        // Set new cursor position
-        if inputHasBeenModified, let newCursorPosition = textView.position(from: cursorPosition, offset: cursorOffset) {
-            textView.selectedTextRange = textView.textRange(from: newCursorPosition, to: newCursorPosition)
-        }
-        
         return !inputHasBeenModified
     }
     
     // MARK: - Helpers
-    //TODO: Refactor most of this into an extension UITextView
-    private func characterAfterCursorPosition(in textView: UITextView) -> String {
-        guard let currentPosition = textView.selectedTextRange?.start,
-            let range = textView.characterRange(byExtending: currentPosition, in: UITextLayoutDirection.right),
-            let character = textView.text(in: range) else { return "" }
-        return character
-    }
-    
-    private func characterBeforeCursorPosition(in textView: UITextView) -> String {
-        guard let currentPosition = textView.selectedTextRange?.start,
-            let range = textView.characterRange(byExtending: currentPosition, in: UITextLayoutDirection.left),
-            let character = textView.text(in: range) else { return "" }
-        return character
-    }
-    
-    private func characterAfter(_ position: UITextPosition, in textView: UITextView) -> String {
-        guard let range = textView.characterRange(byExtending: position, in: UITextLayoutDirection.right),
-            let character = textView.text(in: range) else { return "" }
-        return character
-    }
-    
-    private func characterBefore(_ position: UITextPosition, in textView: UITextView) -> String {
-        guard let range = textView.characterRange(byExtending: position, in: UITextLayoutDirection.left),
-            let character = textView.text(in: range) else { return "" }
-        return character
-    }
-    
-    private func positionAfterPrevious(_ string: String, in textView: UITextView) -> UITextPosition? {
-        guard let cursorPosition = textView.selectedTextRange?.start else { return nil }
-        var previousCharacter: String?
-        var offset = -1
-        var position = UITextPosition()
-        while previousCharacter != string {
-            guard let currentPosition = textView.position(from: cursorPosition, offset: offset) else { return nil }
-            position = currentPosition
-            previousCharacter = characterBefore(currentPosition, in: textView)
-            offset -= 1
-        }
-        return position
-    }
-    
-    private func currentIndentationLevel(in textView: UITextView) -> Int {
-        guard let startOfLine = positionAfterPrevious("\n", in: textView) else { return 0 }
-        var offset = 0
-        var indentationLevel = 0
-        var nextCharacter = ""
-        
-        while true {
-            guard let currentPosition = textView.position(from: startOfLine, offset: offset) else { break }
-            nextCharacter = characterAfter(currentPosition, in: textView)
-            if nextCharacter == "\t" { indentationLevel += 1; offset += 1 }
-            else { break }
-        }
-        
-        return indentationLevel
-    }
-    
     private func indentation(level: Int) -> String {
         var indentation = ""
         var i = level
         while i > 0 { indentation += "\t"; i -= 1 }
         return indentation
     }
-    
-    private func number(of string: String, in textView: UITextView) -> Int {
-        guard let range = textView.textRange(from: textView.beginningOfDocument, to: textView.endOfDocument),
-            let text = textView.text(in: range) else { return 0 }
-        let split =  text.components(separatedBy: string)
-        return split.count-1
-    }
-    
-    private func difference(between string1: String, and string2: String, in textView: UITextView) -> Int {
-        let number1 = number(of: string1, in: textView)
-        let number2 = number(of: string2, in: textView)
-        return number1 - number2
-    }
-
-//
-//    private func number(ofPreceding string: String, in textView: UITextView) -> Int {
-//        guard let currentPosition = textView.selectedTextRange?.start,
-//            let range = textView.textRange(from: textView.beginningOfDocument, to: currentPosition),
-//            let text = textView.text(in: range) else { return 0 }
-//        let split =  text.components(separatedBy: string)
-//        return split.count-1
-//    }
-//    
-//    private func number(ofFollowing string: String, in textView: UITextView) -> Int {
-//        guard let currentPosition = textView.selectedTextRange?.start,
-//            let range = textView.textRange(from: currentPosition, to: textView.endOfDocument),
-//            let text = textView.text(in: range) else { return 0 }
-//        let split =  text.components(separatedBy: string)
-//        return split.count-1
-//    }
-//    
-//
-//    private func difference(betweenPreceding string1: String, andPreceding string2: String, in textView: UITextView) -> Int {
-//        let number1 = number(ofPreceding: string1, in: textView)
-//        let number2 = number(ofPreceding: string2, in: textView)
-//        return number1 - number2
-//    }
-//    
-//    private func difference(betweenFollowing string1: String, andFollowing string2: String, in textView: UITextView) -> Int {
-//        let number1 = number(ofFollowing: string1, in: textView)
-//        let number2 = number(ofFollowing: string2, in: textView)
-//        return number1 - number2
-//    }
 }
 
 private extension UITextView {
-    var line: UITextRange? {
+    var currentLine: UITextRange? {
         let newLine = "\n"
-        guard let start = positionAfterPrevious(newLine),
-            let end = positionBeforeNext(newLine) else { return nil }
-        return textRange(from: start, to: end)
+        let beginning = positionAfterPrevious(newLine) ?? beginningOfDocument
+        let end = positionBeforeNext(newLine) ?? endOfDocument
+        return textRange(from: beginning, to: end)
+    }
+    
+    var lineFromStartToCursor: UITextRange? {
+        guard let start = currentLine?.start,
+            let cursorPosition = selectedTextRange?.start else { return nil }
+        return textRange(from: start, to: cursorPosition)
+    }
+    
+    var currentIndentationLevel: UInt {
+        guard let startOfLine = currentLine?.start else { return 0 }
+        var offset = 0
+        var indentationLevel: UInt = 0
+        var nextCharacter = ""
+        
+        while true {
+            guard let currentPosition = self.position(from: startOfLine, offset: offset) else { break }
+            nextCharacter = characterAfter(currentPosition)
+            if nextCharacter == "\t" { indentationLevel += 1; offset += 1 }
+            else { break }
+        }
+        
+        return indentationLevel
     }
     
     func characterBefore(_ position: UITextPosition) -> String {
@@ -205,7 +125,7 @@ private extension UITextView {
         return character
     }
     
-    private func characterAfter(_ position: UITextPosition) -> String {
+    func characterAfter(_ position: UITextPosition) -> String {
         guard let range = characterRange(byExtending: position, in: UITextLayoutDirection.right),
             let character = text(in: range) else { return "" }
         return character
@@ -214,7 +134,7 @@ private extension UITextView {
     func positionAfterPrevious(_ string: String) -> UITextPosition? {
         guard let cursorPosition = selectedTextRange?.start else { return nil }
         var previousCharacter: String?
-        var offset = -1
+        var offset = 0
         var position = UITextPosition()
         while previousCharacter != string {
             guard let currentPosition = self.position(from: cursorPosition, offset: offset) else { return nil }
@@ -228,7 +148,7 @@ private extension UITextView {
     func positionBeforeNext(_ string: String) -> UITextPosition? {
         guard let cursorPosition = selectedTextRange?.start else { return nil }
         var nextCharacter: String?
-        var offset = 1
+        var offset = 0
         var position = UITextPosition()
         while nextCharacter != string {
             guard let currentPosition = self.position(from: cursorPosition, offset: offset) else { return nil }
@@ -238,7 +158,45 @@ private extension UITextView {
         }
         return position
     }
-
+    
+    func number(of string: String) -> Int {
+        guard let wholeDocument = textRange(from: beginningOfDocument, to: endOfDocument) else { return 0 }
+        return number(of: string, in: wholeDocument)
+    }
+    
+    func number(of string: String, in range: UITextRange) -> Int {
+        guard let text = text(in: range) else { return 0 }
+        let split = text.components(separatedBy: string)
+        return split.count-1
+    }
+    
+    func range(_ range: UITextRange, contains string: String) -> Bool {
+        return (number(of: string, in: range)) > 0
+    }
+    
+    func newLine(_ times: UInt = 1) {
+        for _ in 1...times { insertText("\n") }
+    }
+    
+    func indentCurrentLine(_ level: UInt = 1) {
+        guard level > 0,
+            let originalCursorPosition = selectedTextRange?.start,
+            let beginningOfLine = currentLine?.start else { return }
+        moveCursor(to: beginningOfLine)
+        for _ in 1...level { insertText("\t") }
+        moveCursor(to: originalCursorPosition)
+        moveCursor(Int(level))
+    }
+    
+    func moveCursor(_ offset: Int = 1) {
+        guard let oldCursorPosition = selectedTextRange?.start,
+            let newCursorPosition = self.position(from: oldCursorPosition, offset: offset) else { return }
+        selectedTextRange = textRange(from: newCursorPosition, to: newCursorPosition)
+    }
+    
+    func moveCursor(to position: UITextPosition) {
+        selectedTextRange = textRange(from: position, to: position)
+    }
 }
 
 private extension String {
