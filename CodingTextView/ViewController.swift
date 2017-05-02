@@ -26,10 +26,16 @@ extension ViewController: UITextViewDelegate {
         
         switch text {
         case ".":   // test case
-            print(textView.range(textView.lineFromStartToCursor!, contains: "switch"))
+            let position = textView.positionBeforeNext("Kuh")!
+            let range = textView.textRange(from: textView.beginningOfDocument, to: position)!
+            print(textView.text(in: range) ?? "Nichts")
             inputHasBeenModified = true
+        case ":":
+            guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
+            if textView.range(firstPartOfLine, contains: "case") {
+                //textView.indentCurrentLine(<#T##level: UInt##UInt#>)
+            }
         case "\n":
-            // TODO: If first part of line contains "case", that line's indentation should be adapted to its switches indentation
             // TODO: If you type "{}", then put the cursor between the braces and hit enter, the result is not good
             guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
             let previousCharacter = textView.characterBefore(cursorPosition)
@@ -37,7 +43,7 @@ extension ViewController: UITextViewDelegate {
             textView.newLine()
             textView.indentCurrentLine(indentationLevel)
             if previousCharacter == "{" {
-                if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine()}
+                if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine() }
                 if textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 {
                     textView.newLine()
                     textView.indentCurrentLine(indentationLevel)
@@ -131,31 +137,33 @@ private extension UITextView {
     }
     
     func positionAfterPrevious(_ string: String) -> UITextPosition? {
-        guard let cursorPosition = selectedTextRange?.start else { return nil }
-        var previousCharacter: String?
-        var offset = 0
-        var position = UITextPosition()
-        while previousCharacter != string {
-            guard let currentPosition = self.position(from: cursorPosition, offset: offset) else { return nil }
-            position = currentPosition
-            previousCharacter = characterBefore(currentPosition)
-            offset -= 1
+        guard var endOfRange = selectedTextRange?.start,
+            var startOfRange = position(from: endOfRange, offset: -string.characters.count) else { return nil }
+        while true {
+            guard let range = textRange(from: startOfRange, to: endOfRange) else { return nil }
+            if text(in: range) == string {
+                return range.end
+            }
+            guard let newStart = position(from: startOfRange, offset: -1),
+                let newEnd = position(from: endOfRange, offset: -1) else { return nil }
+            startOfRange = newStart
+            endOfRange = newEnd
         }
-        return position
     }
     
     func positionBeforeNext(_ string: String) -> UITextPosition? {
-        guard let cursorPosition = selectedTextRange?.start else { return nil }
-        var nextCharacter: String?
-        var offset = 0
-        var position = UITextPosition()
-        while nextCharacter != string {
-            guard let currentPosition = self.position(from: cursorPosition, offset: offset) else { return nil }
-            position = currentPosition
-            nextCharacter = characterAfter(currentPosition)
-            offset += 1
+        guard var startOfRange = selectedTextRange?.start,
+            var endOfRange = position(from: startOfRange, offset: string.characters.count) else { return nil }
+        while true {
+            guard let range = textRange(from: startOfRange, to: endOfRange) else { return nil }
+            if text(in: range) == string {
+                return range.start
+            }
+            guard let newStart = position(from: startOfRange, offset: 1),
+                let newEnd = position(from: endOfRange, offset: 1) else { return nil }
+            startOfRange = newStart
+            endOfRange = newEnd
         }
-        return position
     }
     
     func number(of string: String) -> Int {
