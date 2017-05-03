@@ -29,7 +29,7 @@ extension ViewController: UITextViewDelegate {
         case "1":   // test case
             print(textView.characterBefore(cursorPosition, ignoring: [" ", "\t"]))
             inputHasBeenModified = true
-        case "2":
+        case "2":   // test case
             print(textView.characterAfter(cursorPosition, ignoring: [" ", "\t"]))
             inputHasBeenModified = true
             
@@ -43,20 +43,27 @@ extension ViewController: UITextViewDelegate {
             textView.moveCursor(to: cursorPosition)
             textView.indentCurrentLine(switchIndentationLevel - caseIndentationLevel)
         case "\n":
-            // TODO: If you type "{}", then put the cursor between the braces and hit enter, the result is not good
             guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
             let previousCharacter = textView.characterBefore(cursorPosition, ignoring: [" ", "\t"])
+            let followingCharacter = textView.characterAfter(cursorPosition)
             let indentationLevel = textView.currentIndentationLevel
             textView.newLine()
             textView.indentCurrentLine(indentationLevel)
             inputHasBeenModified = true
             if previousCharacter == "{" {
+                guard followingCharacter != previousCharacter.counterpart else {
+                    textView.newLine()
+                    textView.indentCurrentLine(indentationLevel)
+                    textView.moveCursor(-(indentationLevel+1))
+                    textView.indentCurrentLine()
+                    break
+                }
                 if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine() }
                 guard textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 else { break }
                 textView.newLine()
                 textView.indentCurrentLine(indentationLevel)
                 textView.insertText("}")
-                textView.moveCursor(-(Int(indentationLevel)+2))
+                textView.moveCursor(-(indentationLevel+2))
             } else if previousCharacter == ":", textView.range(firstPartOfLine, contains: "case") {
                 textView.indentCurrentLine()
             }
