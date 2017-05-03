@@ -101,17 +101,10 @@ extension ViewController: UITextViewDelegate {
         
         return !inputHasBeenModified
     }
-    
-//    // MARK: - Helpers
-//    private func indentation(level: Int) -> String {
-//        var indentation = ""
-//        var i = level
-//        while i > 0 { indentation += "\t"; i -= 1 }
-//        return indentation
-//    }
 }
 
 private extension UITextView {
+    // MARK: - Information
     var currentLine: UITextRange? {
         let newLine = "\n"
         let beginning = positionAfterPrevious(newLine) ?? beginningOfDocument
@@ -198,6 +191,7 @@ private extension UITextView {
         return (number(of: string, in: range)) > 0
     }
     
+    // MARK: - Actions
     func newLine(_ times: UInt = 1) {
         for _ in 1...times { insertText("\n") }
     }
