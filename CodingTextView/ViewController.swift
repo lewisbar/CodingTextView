@@ -103,7 +103,8 @@ extension ViewController: UITextViewDelegate {
 }
 
 private extension UITextView {
-    // MARK: - Information
+    // MARK: - INFORMATION
+    // MARK: About the current line
     var currentLine: UITextRange? {
         let newLine = "\n"
         let beginning = positionAfterPrevious(newLine) ?? beginningOfDocument
@@ -133,6 +134,7 @@ private extension UITextView {
         return indentationLevel
     }
     
+    // MARK: Looking up characters at certain positions
     func characterBefore(_ position: UITextPosition, ignoring: [String] = []) -> String {
         guard let range = characterRange(byExtending: position, in: .left),
             let character = text(in: range) else { return "" }
@@ -165,6 +167,7 @@ private extension UITextView {
         return nextCharacter
     }
     
+    // MARK: Finding nearby strings
     func positionAfterPrevious(_ string: String) -> UITextPosition? {
         guard var endOfRange = selectedTextRange?.start,
             var startOfRange = position(from: endOfRange, offset: -string.characters.count) else { return nil }
@@ -195,6 +198,7 @@ private extension UITextView {
         }
     }
     
+    // MARK: Looking for occurrences of certain strings
     func number(of string: String) -> Int {
         guard let wholeDocument = textRange(from: beginningOfDocument, to: endOfDocument) else { return 0 }
         return number(of: string, in: wholeDocument)
@@ -214,7 +218,7 @@ private extension UITextView {
         return (number(of: string, in: range)) > 0
     }
     
-    // MARK: - Actions
+    // MARK: - ACTIONS
     func newLine(_ times: UInt = 1) {
         for _ in 1...times { insertText("\n") }
     }
