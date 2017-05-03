@@ -52,7 +52,7 @@ extension ViewController: UITextViewDelegate {
             }
         case "\n":
             // TODO: If you type "{}", then put the cursor between the braces and hit enter, the result is not good
-            // TODO: Ignore spaces as previous characters. Hitting return after ": " should have the same effect as after ":".
+            // TODO: Ignore spaces as previous characters. Hitting return after ": " should have the same effect as after ":". Add a parameter "ignoringTabsAndSpaces" to the appropriate functions. This parameter could even be true by default and only be set to false when explicitly working with tabs.
             guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
             let previousCharacter = textView.characterBefore(cursorPosition)
             let indentationLevel = textView.currentIndentationLevel
@@ -61,7 +61,7 @@ extension ViewController: UITextViewDelegate {
             inputHasBeenModified = true
             if previousCharacter == "{" {
                 if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine() }
-                guard textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 else { return true }
+                guard textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 else { break }
                 textView.newLine()
                 textView.indentCurrentLine(indentationLevel)
                 textView.insertText("}")
