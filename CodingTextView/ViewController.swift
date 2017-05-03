@@ -58,18 +58,17 @@ extension ViewController: UITextViewDelegate {
             let indentationLevel = textView.currentIndentationLevel
             textView.newLine()
             textView.indentCurrentLine(indentationLevel)
+            inputHasBeenModified = true
             if previousCharacter == "{" {
                 if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine() }
-                if textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 {
-                    textView.newLine()
-                    textView.indentCurrentLine(indentationLevel)
-                    textView.insertText("}")
-                    textView.moveCursor(-(Int(indentationLevel)+2))
-                }
+                guard textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 else { return true }
+                textView.newLine()
+                textView.indentCurrentLine(indentationLevel)
+                textView.insertText("}")
+                textView.moveCursor(-(Int(indentationLevel)+2))
             } else if previousCharacter == ":", textView.range(firstPartOfLine, contains: "case") {
                 textView.indentCurrentLine()
             }
-            inputHasBeenModified = true
         case "(", "[":
             if textView.number(of: text) - textView.number(of: text.counterpart) >= 0 {
                 textView.insertText(text + text.counterpart)
