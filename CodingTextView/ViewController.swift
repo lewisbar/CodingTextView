@@ -25,18 +25,34 @@ extension ViewController: UITextViewDelegate {
         var inputHasBeenModified = false
         
         switch text {
-        case ".":   // test case
-            let position = textView.positionBeforeNext("Kuh")!
-            let range = textView.textRange(from: textView.beginningOfDocument, to: position)!
-            print(textView.text(in: range) ?? "Nichts")
+            
+        case "1":   // test case
+            textView.indentCurrentLine()
             inputHasBeenModified = true
+        case "2":   // test case
+            textView.indentCurrentLine(3)
+            inputHasBeenModified = true
+        case "3":   // test case
+            textView.indentCurrentLine(-3)
+            inputHasBeenModified = true
+        case "4":   // test case
+            textView.indentCurrentLine(0)
+            inputHasBeenModified = true
+            
         case ":":
             guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
             if textView.range(firstPartOfLine, contains: "case") {
-                //textView.indentCurrentLine(<#T##level: UInt##UInt#>)
+                if let lastSwitchPosition = textView.positionAfterPrevious("switch") {
+                    let caseIndentationLevel = textView.currentIndentationLevel
+                    textView.moveCursor(to: lastSwitchPosition)
+                    let switchIndentationLevel = textView.currentIndentationLevel
+                    textView.moveCursor(to: cursorPosition)
+                    textView.indentCurrentLine(switchIndentationLevel - caseIndentationLevel)
+                }
             }
         case "\n":
             // TODO: If you type "{}", then put the cursor between the braces and hit enter, the result is not good
+            // TODO: Ignore spaces as previous characters. Hitting return after ": " should have the same effect as after ":".
             guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
             let previousCharacter = textView.characterBefore(cursorPosition)
             let indentationLevel = textView.currentIndentationLevel
@@ -50,6 +66,8 @@ extension ViewController: UITextViewDelegate {
                     textView.insertText("}")
                     textView.moveCursor(-(Int(indentationLevel)+2))
                 }
+            } else if previousCharacter == ":", textView.range(firstPartOfLine, contains: "case") {
+                textView.indentCurrentLine()
             }
             inputHasBeenModified = true
         case "(", "[":
@@ -85,13 +103,13 @@ extension ViewController: UITextViewDelegate {
         return !inputHasBeenModified
     }
     
-    // MARK: - Helpers
-    private func indentation(level: Int) -> String {
-        var indentation = ""
-        var i = level
-        while i > 0 { indentation += "\t"; i -= 1 }
-        return indentation
-    }
+//    // MARK: - Helpers
+//    private func indentation(level: Int) -> String {
+//        var indentation = ""
+//        var i = level
+//        while i > 0 { indentation += "\t"; i -= 1 }
+//        return indentation
+//    }
 }
 
 private extension UITextView {
@@ -108,10 +126,10 @@ private extension UITextView {
         return textRange(from: start, to: cursorPosition)
     }
     
-    var currentIndentationLevel: UInt {
+    var currentIndentationLevel: Int {
         guard let startOfLine = currentLine?.start else { return 0 }
         var offset = 0
-        var indentationLevel: UInt = 0
+        var indentationLevel = 0
         var nextCharacter = ""
         
         while true {
@@ -185,14 +203,22 @@ private extension UITextView {
         for _ in 1...times { insertText("\n") }
     }
     
-    func indentCurrentLine(_ level: UInt = 1) {
-        guard level > 0,
-            let originalCursorPosition = selectedTextRange?.start,
+    func indentCurrentLine(_ steps: Int = 1) {
+        guard let originalCursorPosition = selectedTextRange?.start,
             let beginningOfLine = currentLine?.start else { return }
-        moveCursor(to: beginningOfLine)
-        for _ in 1...level { insertText("\t") }
-        moveCursor(to: originalCursorPosition)
-        moveCursor(Int(level))
+        if steps > 0 {
+            moveCursor(to: beginningOfLine)
+            for _ in 1...steps { insertText("\t") }
+            moveCursor(to: originalCursorPosition)
+            moveCursor(steps)
+        } else if (steps < 0) && (currentIndentationLevel > 0) {
+            let surplusTabsCount = min(-steps, currentIndentationLevel)
+            guard let endOfSurplusTabs = position(from: beginningOfLine, offset: surplusTabsCount),
+                let range = textRange(from: beginningOfLine, to: endOfSurplusTabs),
+                let newCursorPosition = position(from: originalCursorPosition, offset: -surplusTabsCount) else { return }
+            replace(range, withText: "")
+            moveCursor(to: newCursorPosition)
+        }
     }
     
     func moveCursor(_ offset: Int = 1) {
