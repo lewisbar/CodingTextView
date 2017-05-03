@@ -27,34 +27,25 @@ extension ViewController: UITextViewDelegate {
         switch text {
             
         case "1":   // test case
-            textView.indentCurrentLine()
+            print(textView.characterBefore(cursorPosition, ignoring: [" ", "\t"]))
             inputHasBeenModified = true
-        case "2":   // test case
-            textView.indentCurrentLine(3)
-            inputHasBeenModified = true
-        case "3":   // test case
-            textView.indentCurrentLine(-3)
-            inputHasBeenModified = true
-        case "4":   // test case
-            textView.indentCurrentLine(0)
+        case "2":
+            print(textView.characterAfter(cursorPosition, ignoring: [" ", "\t"]))
             inputHasBeenModified = true
             
         case ":":
-            guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
-            if textView.range(firstPartOfLine, contains: "case") {
-                if let lastSwitchPosition = textView.positionAfterPrevious("switch") {
-                    let caseIndentationLevel = textView.currentIndentationLevel
-                    textView.moveCursor(to: lastSwitchPosition)
-                    let switchIndentationLevel = textView.currentIndentationLevel
-                    textView.moveCursor(to: cursorPosition)
-                    textView.indentCurrentLine(switchIndentationLevel - caseIndentationLevel)
-                }
-            }
+            guard let firstPartOfLine = textView.lineFromStartToCursor,
+                textView.range(firstPartOfLine, contains: "case"),
+                let lastSwitchPosition = textView.positionAfterPrevious("switch") else { return true }
+            let caseIndentationLevel = textView.currentIndentationLevel
+            textView.moveCursor(to: lastSwitchPosition)
+            let switchIndentationLevel = textView.currentIndentationLevel
+            textView.moveCursor(to: cursorPosition)
+            textView.indentCurrentLine(switchIndentationLevel - caseIndentationLevel)
         case "\n":
             // TODO: If you type "{}", then put the cursor between the braces and hit enter, the result is not good
-            // TODO: Ignore spaces as previous characters. Hitting return after ": " should have the same effect as after ":". Add a parameter "ignoringTabsAndSpaces" to the appropriate functions. This parameter could even be true by default and only be set to false when explicitly working with tabs.
             guard let firstPartOfLine = textView.lineFromStartToCursor else { return true }
-            let previousCharacter = textView.characterBefore(cursorPosition)
+            let previousCharacter = textView.characterBefore(cursorPosition, ignoring: [" ", "\t"])
             let indentationLevel = textView.currentIndentationLevel
             textView.newLine()
             textView.indentCurrentLine(indentationLevel)
@@ -134,16 +125,36 @@ private extension UITextView {
         return indentationLevel
     }
     
-    func characterBefore(_ position: UITextPosition) -> String {
-        guard let range = characterRange(byExtending: position, in: UITextLayoutDirection.left),
+    func characterBefore(_ position: UITextPosition, ignoring: [String] = []) -> String {
+        guard let range = characterRange(byExtending: position, in: .left),
             let character = text(in: range) else { return "" }
-        return character
+        
+        var offset = -1
+        var nextCharacter = character
+        while ignoring.contains(nextCharacter) {
+            guard let nextPosition = self.position(from: position, offset: offset),
+                let nextRange = characterRange(byExtending: nextPosition, in: .left),
+                let character = text(in: nextRange) else { return "" }
+            nextCharacter = character
+            offset -= 1
+        }
+        return nextCharacter
     }
     
-    func characterAfter(_ position: UITextPosition) -> String {
-        guard let range = characterRange(byExtending: position, in: UITextLayoutDirection.right),
+    func characterAfter(_ position: UITextPosition, ignoring: [String] = []) -> String {
+        guard let range = characterRange(byExtending: position, in: .right),
             let character = text(in: range) else { return "" }
-        return character
+        
+        var offset = 1
+        var nextCharacter = character
+        while ignoring.contains(nextCharacter) {
+            guard let nextPosition = self.position(from: position, offset: offset),
+                let nextRange = characterRange(byExtending: nextPosition, in: .left),
+                let character = text(in: nextRange) else { return "" }
+            nextCharacter = character
+            offset += 1
+        }
+        return nextCharacter
     }
     
     func positionAfterPrevious(_ string: String) -> UITextPosition? {
