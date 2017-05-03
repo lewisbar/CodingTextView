@@ -24,15 +24,7 @@ extension ViewController: UITextViewDelegate {
         guard let cursorPosition = textView.selectedTextRange?.start else { return true }
         var inputHasBeenModified = false
         
-        switch text {
-            
-        case "1":   // test case
-            print(textView.characterBefore(cursorPosition, ignoring: [" ", "\t"]))
-            inputHasBeenModified = true
-        case "2":   // test case
-            print(textView.characterAfter(cursorPosition, ignoring: [" ", "\t"]))
-            inputHasBeenModified = true
-            
+        switch text { 
         case ":":
             guard let firstPartOfLine = textView.lineFromStartToCursor,
                 textView.range(firstPartOfLine, contains: "case") || textView.range(firstPartOfLine, contains: "default"),
@@ -51,7 +43,7 @@ extension ViewController: UITextViewDelegate {
             textView.indentCurrentLine(indentationLevel)
             inputHasBeenModified = true
             if previousCharacter == "{" {
-                guard followingCharacter != previousCharacter.counterpart else {
+                if followingCharacter == previousCharacter.counterpart {
                     textView.newLine()
                     textView.indentCurrentLine(indentationLevel)
                     textView.moveCursor(-(indentationLevel+1))
@@ -59,11 +51,12 @@ extension ViewController: UITextViewDelegate {
                     break
                 }
                 if !textView.range(firstPartOfLine, contains: "switch") { textView.indentCurrentLine() }
-                guard textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 else { break }
-                textView.newLine()
-                textView.indentCurrentLine(indentationLevel)
-                textView.insertText("}")
-                textView.moveCursor(-(indentationLevel+2))
+                if textView.number(of: previousCharacter) - textView.number(of: previousCharacter.counterpart) > 0 {
+                    textView.newLine()
+                    textView.indentCurrentLine(indentationLevel)
+                    textView.insertText("}")
+                    textView.moveCursor(-(indentationLevel+2))
+                }
             } else if previousCharacter == ":",
                 textView.range(firstPartOfLine, contains: "case") || textView.range(firstPartOfLine, contains: "default") {
                 textView.indentCurrentLine()
