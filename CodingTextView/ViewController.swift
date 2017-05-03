@@ -35,7 +35,7 @@ extension ViewController: UITextViewDelegate {
             
         case ":":
             guard let firstPartOfLine = textView.lineFromStartToCursor,
-                textView.range(firstPartOfLine, contains: "case"),
+                textView.range(firstPartOfLine, contains: "case") || textView.range(firstPartOfLine, contains: "default"),
                 let lastSwitchPosition = textView.positionAfterPrevious("switch") else { return true }
             let caseIndentationLevel = textView.currentIndentationLevel
             textView.moveCursor(to: lastSwitchPosition)
@@ -64,21 +64,22 @@ extension ViewController: UITextViewDelegate {
                 textView.indentCurrentLine(indentationLevel)
                 textView.insertText("}")
                 textView.moveCursor(-(indentationLevel+2))
-            } else if previousCharacter == ":", textView.range(firstPartOfLine, contains: "case") {
+            } else if previousCharacter == ":",
+                textView.range(firstPartOfLine, contains: "case") || textView.range(firstPartOfLine, contains: "default") {
                 textView.indentCurrentLine()
             }
         case "(", "[":
-            if textView.number(of: text) - textView.number(of: text.counterpart) >= 0 {
+            if textView.containsMore(of: text, than: text.counterpart) {
                 textView.insertText(text + text.counterpart)
                 textView.moveCursor(-1)
                 inputHasBeenModified = true
             }
         case "}", ")", "]":
             if textView.characterAfter(cursorPosition) == text
-                && textView.number(of: text) - textView.number(of: text.counterpart) >= 0 {
+                && textView.containsMore(of: text, than: text.counterpart) {
                 textView.moveCursor()
                 inputHasBeenModified = true
-            } else if textView.number(of: text) - textView.number(of: text.counterpart) >= 0 {
+            } else if textView.containsMore(of: text, than: text.counterpart) {
                 // TODO: play warning sound
                 print("too many closed brackets")
             }
@@ -203,6 +204,10 @@ private extension UITextView {
         guard let text = text(in: range) else { return 0 }
         let split = text.components(separatedBy: string)
         return split.count-1
+    }
+    
+    func containsMore(of string1: String, than string2: String) -> Bool {
+        return number(of: string1) - number(of: string2) >= 0
     }
     
     func range(_ range: UITextRange, contains string: String) -> Bool {
