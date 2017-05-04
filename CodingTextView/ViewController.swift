@@ -24,7 +24,7 @@ extension ViewController: UITextViewDelegate {
         guard let cursorPosition = textView.selectedTextRange?.start else { return true }
         var inputHasBeenModified = false
         
-        switch text { 
+        switch text {
         case ":":
             guard let firstPartOfLine = textView.lineFromStartToCursor,
                 textView.range(firstPartOfLine, contains: "case") || textView.range(firstPartOfLine, contains: "default"),
@@ -213,6 +213,7 @@ private extension UITextView {
     
     // MARK: - ACTIONS
     func newLine(_ times: UInt = 1) {
+        guard times > 0 else { return }
         for _ in 1...times { insertText("\n") }
     }
     
