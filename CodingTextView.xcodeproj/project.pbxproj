@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3043D7E81EC7A05700ACB1E2 /* InsertAsCodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3043D7E71EC7A05700ACB1E2 /* InsertAsCodeTests.swift */; };
 		B92F02B11EAE809D007875B1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B92F02B01EAE809D007875B1 /* AppDelegate.swift */; };
 		B92F02B31EAE809D007875B1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B92F02B21EAE809D007875B1 /* ViewController.swift */; };
 		B92F02B61EAE809D007875B1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B92F02B41EAE809D007875B1 /* Main.storyboard */; };
@@ -14,7 +15,20 @@
 		B92F02BB1EAE809D007875B1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B92F02B91EAE809D007875B1 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		3043D7E21EC7A03100ACB1E2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B92F02A51EAE809D007875B1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B92F02AC1EAE809D007875B1;
+			remoteInfo = CodingTextView;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		3043D7DD1EC7A03100ACB1E2 /* CodingTextViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodingTextViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3043D7E11EC7A03100ACB1E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3043D7E71EC7A05700ACB1E2 /* InsertAsCodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsertAsCodeTests.swift; sourceTree = "<group>"; };
 		B92F02AD1EAE809D007875B1 /* CodingTextView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodingTextView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B92F02B01EAE809D007875B1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B92F02B21EAE809D007875B1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -25,6 +39,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3043D7DA1EC7A03100ACB1E2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B92F02AA1EAE809D007875B1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -35,10 +56,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3043D7DE1EC7A03100ACB1E2 /* CodingTextViewTests */ = {
+			isa = PBXGroup;
+			children = (
+				3043D7E71EC7A05700ACB1E2 /* InsertAsCodeTests.swift */,
+				3043D7E11EC7A03100ACB1E2 /* Info.plist */,
+			);
+			path = CodingTextViewTests;
+			sourceTree = "<group>";
+		};
 		B92F02A41EAE809D007875B1 = {
 			isa = PBXGroup;
 			children = (
 				B92F02AF1EAE809D007875B1 /* CodingTextView */,
+				3043D7DE1EC7A03100ACB1E2 /* CodingTextViewTests */,
 				B92F02AE1EAE809D007875B1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -47,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				B92F02AD1EAE809D007875B1 /* CodingTextView.app */,
+				3043D7DD1EC7A03100ACB1E2 /* CodingTextViewTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -67,6 +99,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3043D7DC1EC7A03100ACB1E2 /* CodingTextViewTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3043D7E41EC7A03100ACB1E2 /* Build configuration list for PBXNativeTarget "CodingTextViewTests" */;
+			buildPhases = (
+				3043D7D91EC7A03100ACB1E2 /* Sources */,
+				3043D7DA1EC7A03100ACB1E2 /* Frameworks */,
+				3043D7DB1EC7A03100ACB1E2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3043D7E31EC7A03100ACB1E2 /* PBXTargetDependency */,
+			);
+			name = CodingTextViewTests;
+			productName = CodingTextViewTests;
+			productReference = 3043D7DD1EC7A03100ACB1E2 /* CodingTextViewTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		B92F02AC1EAE809D007875B1 /* CodingTextView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B92F02BF1EAE809E007875B1 /* Build configuration list for PBXNativeTarget "CodingTextView" */;
@@ -90,10 +140,16 @@
 		B92F02A51EAE809D007875B1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0820;
+				LastSwiftUpdateCheck = 0830;
 				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Lennart Wisbar";
 				TargetAttributes = {
+					3043D7DC1EC7A03100ACB1E2 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = 9SPL76B3GR;
+						ProvisioningStyle = Automatic;
+						TestTargetID = B92F02AC1EAE809D007875B1;
+					};
 					B92F02AC1EAE809D007875B1 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 9SPL76B3GR;
@@ -115,11 +171,19 @@
 			projectRoot = "";
 			targets = (
 				B92F02AC1EAE809D007875B1 /* CodingTextView */,
+				3043D7DC1EC7A03100ACB1E2 /* CodingTextViewTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3043D7DB1EC7A03100ACB1E2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B92F02AB1EAE809D007875B1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -133,6 +197,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3043D7D91EC7A03100ACB1E2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3043D7E81EC7A05700ACB1E2 /* InsertAsCodeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B92F02A91EAE809D007875B1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,6 +215,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3043D7E31EC7A03100ACB1E2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B92F02AC1EAE809D007875B1 /* CodingTextView */;
+			targetProxy = 3043D7E21EC7A03100ACB1E2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		B92F02B41EAE809D007875B1 /* Main.storyboard */ = {
@@ -164,6 +244,38 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		3043D7E51EC7A03100ACB1E2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				DEVELOPMENT_TEAM = 9SPL76B3GR;
+				INFOPLIST_FILE = CodingTextViewTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = de.lennartwisbar.CodingTextViewTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodingTextView.app/CodingTextView";
+			};
+			name = Debug;
+		};
+		3043D7E61EC7A03100ACB1E2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				DEVELOPMENT_TEAM = 9SPL76B3GR;
+				INFOPLIST_FILE = CodingTextViewTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = de.lennartwisbar.CodingTextViewTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodingTextView.app/CodingTextView";
+			};
+			name = Release;
+		};
 		B92F02BD1EAE809E007875B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -286,6 +398,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3043D7E41EC7A03100ACB1E2 /* Build configuration list for PBXNativeTarget "CodingTextViewTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3043D7E51EC7A03100ACB1E2 /* Debug */,
+				3043D7E61EC7A03100ACB1E2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		B92F02A81EAE809D007875B1 /* Build configuration list for PBXProject "CodingTextView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -302,6 +422,7 @@
 				B92F02C11EAE809E007875B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
