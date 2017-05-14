@@ -27,7 +27,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         get {
             let cursorPosition = textView.selectedTextRange?.start
             XCTAssertNotNil(cursorPosition)
-            return textView.offset(from: cursorPosition!, to: textView.endOfDocument)
+            return -textView.offset(from: cursorPosition!, to: textView.endOfDocument)
         }
         set {
             let position = textView.position(from: textView.endOfDocument, offset: newValue)
@@ -43,6 +43,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         cursorOffsetFromEnd = -1
         textView.insertAsCode("a")
         XCTAssertEqual(textView.text, "Hellao")     // "a" after "Hell"
+        XCTAssertEqual(cursorOffsetFromEnd, -1)     // after the typed "a"
     }
     
     // MARK: - Colon
@@ -58,6 +59,7 @@ class InsertAsCodeUnitTests: XCTestCase {
                         "\t\tswitch test {\n" +
                         "\t\tcase:\n" +     // Colon after "case", one tab removed
                         "\t\t}")
+        XCTAssertEqual(cursorOffsetFromEnd, -4) // after the typed colon
     }
     
     func testColonGivesDefaultIndentationOfLastSwitch() {
@@ -72,6 +74,7 @@ class InsertAsCodeUnitTests: XCTestCase {
                         "\t\tswitch test {\n" +
                         "\t\tdefault:\n" +     // Colon after "default", one tab removed
                         "\t\t}")
+        XCTAssertEqual(cursorOffsetFromEnd, -4) // after the typed colon
     }
     
     func testColonTreatedNormallyIfNoSwitch() {
@@ -84,6 +87,7 @@ class InsertAsCodeUnitTests: XCTestCase {
                        "Line 1\n" +
                         "\t\t\tcase:\n" +     // Colon after "case", no tabs removed
                         "\t\t}")
+        XCTAssertEqual(cursorOffsetFromEnd, -4) // after the typed colon
     }
     
     func testColonTreatedNormallyIfNoCaseOrDefault() {
@@ -94,6 +98,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         XCTAssertEqual(textView.text,
                        "Line 1\n" +
                         "\t\t\tnormalText:")    // Colon after "normalText", no tabs removed
+        XCTAssertEqual(cursorOffsetFromEnd, 0)  // at the end
     }
     
     // MARK: - Return Key
@@ -106,6 +111,7 @@ class InsertAsCodeUnitTests: XCTestCase {
                        "Line 1\n" +
                         "\t\tnormalText\n" +
                         "\t\t")     // Indentation level maintained
+        XCTAssertEqual(cursorOffsetFromEnd, 0)  // at the end
     }
     
     func testReturnKeyAfterSwitchWithCurlyBraceMaintainsIndentationAndClosesBrace() {
@@ -118,7 +124,8 @@ class InsertAsCodeUnitTests: XCTestCase {
                         "\t\tswitch test {\n" +
                         "\t\t\n" +    // Indentation level maintained
                         "\t\t}")     // Closed curly brace added
+        XCTAssertEqual(cursorOffsetFromEnd, -4) // in the line after the switch, after the indentation
     }
     
-    //TODO: Evalutate cursor position at the end of every test func
+    
 }
