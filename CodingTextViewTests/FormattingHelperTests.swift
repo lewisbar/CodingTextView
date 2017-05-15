@@ -1,10 +1,13 @@
 //
-//  InsertAsCodeTests.swift
+//  FormattingHelperTests.swift
 //  CodingTextView
 //
 //  Created by Lennart Wisbar on 12.05.17.
 //  Copyright © 2017 Lennart Wisbar. All rights reserved.
 //
+
+//  MARK: Test Naming Rule
+//  TEST_ACTION_EXPECTATION(_CONDITION)
 
 import XCTest
 @testable import CodingTextView
@@ -38,7 +41,7 @@ class InsertAsCodeUnitTests: XCTestCase {
     }
     
     // MARK: - Normal Characters
-    func testNormalCharactersNotAffected() {
+    func test_NormalCharacters_NotAffected() {
         textView.text = "Hello"
         cursorOffsetFromEnd = -1
         textView.insertAsCode("a")
@@ -48,7 +51,7 @@ class InsertAsCodeUnitTests: XCTestCase {
     }
     
     // MARK: - Colon
-    func testColonGivesCaseIndentationOfLastSwitch() {
+    func test_ColonAfterCase_AdoptsSwitchIndentation() {
         textView.text = "\t\tswitch test {" +
                         "\n\t\t\tcase" +
                         "\n\t\t}"
@@ -62,7 +65,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -4) // after the typed colon
     }
     
-    func testColonGivesDefaultIndentationOfLastSwitch() {
+    func test_ColonAfterDefault_AdoptsSwitchIndentation() {
         textView.text = "\t\tswitch test {" +
                         "\n\t\t\tdefault" +
                         "\n\t\t}"
@@ -76,7 +79,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -4) // after the typed colon
     }
     
-    func testColonTreatedNormallyIfNoSwitch() {
+    func test_ColonAfterCase_TreatedNormally_IfNoSwitch() {
         textView.text = "\t\t\tcase" +
                         "\n\t\t}"
         cursorOffsetFromEnd = -4
@@ -88,7 +91,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -4) // after the typed colon
     }
     
-    func testColonTreatedNormallyIfNoCaseOrDefault() {
+    func test_Colon_TreatedNormally_IfNoCaseOrDefault() {
         textView.text = "\t\t\tnormalText"
         cursorOffsetFromEnd = 0
         textView.insertAsCode(":")
@@ -99,7 +102,7 @@ class InsertAsCodeUnitTests: XCTestCase {
     }
     
     // MARK: - Return Key
-    func testReturnKeyAfterNormalCharacterMaintainsIndentation() {
+    func test_ReturnKeyAfterNormalCharacter_MaintainsIndentation() {
         textView.text = "\t\tnormalText"
         cursorOffsetFromEnd = 0
         textView.insertAsCode("\n")
@@ -110,7 +113,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, 0)  // at the end
     }
     
-    func testReturnKeyAfterCurlyBraceIndentsNextLineAndClosesBrace() {
+    func test_ReturnKeyAfterCurlyBrace_IndentsNextLineAndClosesBrace() {
         textView.text = "\t\ttest {"
         cursorOffsetFromEnd = 0
         textView.insertAsCode("\n")
@@ -122,7 +125,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -4)
     }
     
-    func testReturnKeyBetweenCurlyBracesDoesNotAddAnotherBrace() {
+    func test_ReturnKeyBetweenCurlyBraces_DoesNotAddAnotherBrace() {
         textView.text = "\t\ttest {}"
         cursorOffsetFromEnd = -1
         textView.insertAsCode("\n")
@@ -134,7 +137,7 @@ class InsertAsCodeUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -4)
     }
     
-    func testReturnKeyAfterSwitchWithCurlyBraceMaintainsIndentationAndClosesBrace() {
+    func test_ReturnKeyAfterSwitchWithCurlyBrace_MaintainsIndentationAndClosesBrace() {
         textView.text = "\t\tswitch test {"
         cursorOffsetFromEnd = 0
         textView.insertAsCode("\n")
