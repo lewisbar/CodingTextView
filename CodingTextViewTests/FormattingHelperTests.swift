@@ -229,5 +229,98 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -5) // After the open bracket
     }
     
+    // MARK: - Closed Brackets: Round
+    func test_closedRoundBracketAfterNormalCharacter_TreatedNormally() {
+        textView.text = "bracket (test"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode(")")
+        
+        XCTAssertEqual(textView.text, "bracket (test)") // Normal behavior
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
     
+    func test_closedRoundBracketBeforeClosedRoundBracket_StepsOver() {
+        textView.text = "bracket (test)"
+        cursorOffsetFromEnd = -1
+        textView.insertAsCode(")")
+        
+        XCTAssertEqual(textView.text, "bracket (test)") // No additional bracket
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_closedRoundBracketBeforeClosedRoundBracket_TreatedNormally_IfTooManyOpenBrackets() {
+        textView.text = "(bracket (test)"
+        cursorOffsetFromEnd = -1
+        textView.insertAsCode(")")
+        
+        XCTAssertEqual(textView.text, "(bracket (test))") // Normal behavior
+        XCTAssertEqual(cursorOffsetFromEnd, -1)
+    }
+    
+    // TODO: Play warning sound when too many closed round brackets in the document
+    
+    // MARK: - Closed Brackets: Square
+    func test_closedSquareBracketAfterNormalCharacter_TreatedNormally() {
+        textView.text = "bracket [test"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("]")
+        
+        XCTAssertEqual(textView.text, "bracket [test]") // Normal behavior
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_closedSquareBracketBeforeClosedSquareBracket_StepsOver() {
+        textView.text = "bracket [test]"
+        cursorOffsetFromEnd = -1
+        textView.insertAsCode("]")
+        
+        XCTAssertEqual(textView.text, "bracket [test]") // No additional bracket
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_closedSquareBracketBeforeClosedSquareBracket_TreatedNormally_IfTooManyOpenBrackets() {
+        textView.text = "[bracket [test]"
+        cursorOffsetFromEnd = -1
+        textView.insertAsCode("]")
+        
+        XCTAssertEqual(textView.text, "[bracket [test]]") // Normal behavior
+        XCTAssertEqual(cursorOffsetFromEnd, -1)
+    }
+    
+    // TODO: Play warning sound when too many closed square brackets in the document
+    
+    // MARK: - Closed Curly Braces
+    func test_closedCurlyBraceAfterNormalCharacter_TreatedNormally() {
+        textView.text = "bracket {test"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("}")
+        
+        XCTAssertEqual(textView.text, "bracket {test}") // Normal behavior
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_closedCurlyBraceBeforeClosedCurlyBrace_StepsOver() {
+        textView.text = "bracket {test}"
+        cursorOffsetFromEnd = -1
+        textView.insertAsCode("}")
+        
+        XCTAssertEqual(textView.text, "bracket {test}") // No additional bracket
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_closedCurlyBraceBeforeClosedCurlyBrace_TreatedNormally_IfTooManyOpenBraces() {
+        textView.text = "{bracket {test}"
+        cursorOffsetFromEnd = -1
+        textView.insertAsCode("}")
+        
+        XCTAssertEqual(textView.text, "{bracket {test}}") // Normal behavior
+        XCTAssertEqual(cursorOffsetFromEnd, -1)
+    }
+    
+    // TODO: Play warning sound when too many closed curly braces in the document
+    
+    // MARK: Quotation Marks
+    
+    
+    // MARK: Backspace
 }

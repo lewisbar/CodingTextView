@@ -79,7 +79,7 @@ extension UITextView {
                 inputHasBeenModified = true
             }
         case "}", ")", "]":
-            // Ignore closing of brackets if they already are
+            // Step over closed brackets if typed unnecessarily
             if characterAfter(cursorPosition) == text
                 && containsMore(of: text, than: text.counterpart) {
                 moveCursor()
