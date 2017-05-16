@@ -377,7 +377,7 @@ class FormattingHelperUnitTests: XCTestCase {
     
     // TODO: Play warning sound when too many closed curly braces in the document
     
-    // MARK: Quotation Marks
+    // MARK: - Quotation Marks
     func test_QuotationMark_CompletedByAnotherOne() {
         textView.text = "test "
         cursorOffsetFromEnd = 0
@@ -405,7 +405,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
-    // MARK: Backspace
+    // MARK: - Backspace
     func test_BackspaceOneCharacter() {
         textView.text = "test"
         cursorOffsetFromEnd = 0
