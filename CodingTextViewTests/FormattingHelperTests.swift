@@ -98,7 +98,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
-    // MARK: - Return Key
+    // MARK: - Return Key: Normal Character
     func test_ReturnKeyAfterNormalCharacter_MaintainsIndentation() {
         textView.text = "\t\tnormalText"
         cursorOffsetFromEnd = 0
@@ -110,6 +110,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
+    // MARK: - Return Key: Curly Brace
     func test_ReturnKeyAfterCurlyBrace_IndentsNextLineAndClosesBrace() {
         textView.text = "\t\ttest {"
         cursorOffsetFromEnd = 0
@@ -159,6 +160,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -4) // End of the middle line
     }
     
+    // MARK: - Return Key: "case"
     func test_ReturnKeyAfterCaseWithColon_IndentsNextLine() {
         textView.text = "\t\tcase test:"
         cursorOffsetFromEnd = 0
@@ -167,7 +169,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(textView.text,
                         "\t\tcase test:" +
                         "\n\t\t\t")     // Indentation level raised
-        XCTAssertEqual(cursorOffsetFromEnd, 0) // End of new line
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
     func test_ReturnKeyAfterCaseWithColonAndSpaces_IndentsNextLine() {
@@ -178,7 +180,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(textView.text,
                         "\t\tcase test:   " +
                         "\n\t\t\t")     // Indentation level raised
-        XCTAssertEqual(cursorOffsetFromEnd, 0) // End of new line
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
     func test_ReturnKeyAfterCaseWithoutColon_DoesNotIndentNextLine() {
@@ -189,7 +191,63 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(textView.text,
                         "\t\tcase test" +
                         "\n\t\t")     // Indentation level maintained
-        XCTAssertEqual(cursorOffsetFromEnd, 0) // End of new line
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_ReturnKeyAfterCaseWithTextAfterColon_DoesNotIndentNextLine() {
+        textView.text = "\t\tcase test: text"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("\n")
+        
+        XCTAssertEqual(textView.text,
+                        "\t\tcase test: text" +
+                        "\n\t\t")     // Indentation level maintained
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    // MARK: - Return Key: "default"
+    func test_ReturnKeyAfterDefaultWithColon_IndentsNextLine() {
+        textView.text = "\t\tdefault:"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("\n")
+        
+        XCTAssertEqual(textView.text,
+                        "\t\tdefault:" +
+                        "\n\t\t\t")     // Indentation level raised
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_ReturnKeyAfterDefaultWithColonAndSpaces_IndentsNextLine() {
+        textView.text = "\t\tdefault:   "
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("\n")
+        
+        XCTAssertEqual(textView.text,
+                        "\t\tdefault:   " +
+                        "\n\t\t\t")     // Indentation level raised
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_ReturnKeyAfterDefaultWithoutColon_DoesNotIndentNextLine() {
+        textView.text = "\t\tdefault"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("\n")
+        
+        XCTAssertEqual(textView.text,
+                        "\t\tdefault" +
+                        "\n\t\t")     // Indentation level maintained
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_ReturnKeyAfterDefaultWithTextAfterColon_DoesNotIndentNextLine() {
+        textView.text = "\t\tdefault: text"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("\n")
+        
+        XCTAssertEqual(textView.text,
+                        "\t\tdefault: text" +
+                        "\n\t\t")     // Indentation level maintained
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
     // MARK: - Open Brackets
@@ -325,8 +383,8 @@ class FormattingHelperUnitTests: XCTestCase {
         cursorOffsetFromEnd = 0
         textView.insertAsCode("\"")
         
-        XCTAssertEqual(textView.text, "test \"\"") // One additional quotation mark
-        XCTAssertEqual(cursorOffsetFromEnd, -1) // Between the quotes
+        XCTAssertEqual(textView.text, "test \"\"")  // One additional quotation mark
+        XCTAssertEqual(cursorOffsetFromEnd, -1)     // Between the quotes
     }
     
     func test_QuotationMark_TreatedNormally_IfUnevenNumberOfQuotesInDocument() {
@@ -334,7 +392,7 @@ class FormattingHelperUnitTests: XCTestCase {
         cursorOffsetFromEnd = 0
         textView.insertAsCode("\"")
         
-        XCTAssertEqual(textView.text, "\"test\"") // No additional quotation mark
+        XCTAssertEqual(textView.text, "\"test\"")   // No additional quotation mark
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
@@ -343,17 +401,30 @@ class FormattingHelperUnitTests: XCTestCase {
         cursorOffsetFromEnd = -1    // After "test"
         textView.insertAsCode("\"")
         
-        XCTAssertEqual(textView.text, "\"test\"") // One additional quotation mark
+        XCTAssertEqual(textView.text, "\"test\"")   // One additional quotation mark
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
     // MARK: Backspace
-    func test_Backspace() {
+    func test_BackspaceOneCharacter() {
         textView.text = "test"
         cursorOffsetFromEnd = 0
         textView.insertAsCode("")
         
-        XCTAssertEqual(textView.text, "tes") // Deleted last character
+        XCTAssertEqual(textView.text, "tes")    // Deleted last character
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_BackspaceSelection() {
+        textView.text = "backspace selection test"
+        let end = textView.endOfDocument
+        let start = textView.position(from: end, offset: -4)
+        XCTAssertNotNil(start)
+        let range = textView.textRange(from: start!, to: end)   // "test"
+        textView.selectedTextRange = range
+        textView.insertAsCode("")
+        
+        XCTAssertEqual(textView.text, "backspace selection ")   // Deleted "test"
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
 }
