@@ -42,11 +42,11 @@ class FormattingHelperUnitTests: XCTestCase {
     
     // MARK: - Normal Characters
     func test_NormalCharacters_NotAffected() {
-        textView.text = "Hello"
-        cursorOffsetFromEnd = -1    // Before the "o"
+        textView.text = "test"
+        cursorOffsetFromEnd = -1    // Before the "t"
         textView.insertAsCode("a")
         
-        XCTAssertEqual(textView.text, "Hellao")     // "a" after "Hell"
+        XCTAssertEqual(textView.text, "tesat")     // "a" after "tes"
         XCTAssertEqual(cursorOffsetFromEnd, -1)     // after the typed "a"
     }
     
@@ -320,7 +320,40 @@ class FormattingHelperUnitTests: XCTestCase {
     // TODO: Play warning sound when too many closed curly braces in the document
     
     // MARK: Quotation Marks
+    func test_QuotationMark_CompletedByAnotherOne() {
+        textView.text = "test "
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("\"")
+        
+        XCTAssertEqual(textView.text, "test \"\"") // One additional quotation mark
+        XCTAssertEqual(cursorOffsetFromEnd, -1) // Between the quotes
+    }
     
+    func test_QuotationMark_TreatedNormally_IfUnevenNumberOfQuotesInDocument() {
+        textView.text = "\"test"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("\"")
+        
+        XCTAssertEqual(textView.text, "\"test\"") // No additional quotation mark
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_QuotationMarkBeforeQuotationMark_StepsOver_IfEvenNumberOfQuotesInDocument() {
+        textView.text = "\"test\""
+        cursorOffsetFromEnd = -1    // After "test"
+        textView.insertAsCode("\"")
+        
+        XCTAssertEqual(textView.text, "\"test\"") // One additional quotation mark
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
     
     // MARK: Backspace
+    func test_Backspace() {
+        textView.text = "test"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("")
+        
+        XCTAssertEqual(textView.text, "tes") // Deleted last character
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
 }
