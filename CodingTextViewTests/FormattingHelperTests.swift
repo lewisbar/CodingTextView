@@ -60,7 +60,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -1)     // after the pasted "abc"
     }
     
-    func test_PasteOverSelection() {
+    func test_PasteOverSelection() {    // Should also cover typing something while text is selected
         textView.text = "paste test"
         let end = textView.endOfDocument
         let start = textView.position(from: end, offset: -4)
@@ -144,7 +144,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
-    // MARK: - Return Key: Normal Character
+    // MARK: - Return Key After Normal Character
     func test_ReturnKeyAfterNormalCharacter_MaintainsIndentation() {
         textView.text = "\t\tnormalText"
         cursorOffsetFromEnd = 0
@@ -156,7 +156,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
-    // MARK: - Return Key: Curly Brace
+    // MARK: - Return Key After Curly Brace
     func test_ReturnKeyAfterCurlyBrace_IndentsNextLineAndClosesBrace() {
         textView.text = "\t\ttest {"
         cursorOffsetFromEnd = 0
@@ -206,7 +206,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -4) // End of the middle line
     }
     
-    // MARK: - Return Key: "case"
+    // MARK: - Return Key after "case"
     func test_ReturnKeyAfterCaseWithColon_IndentsNextLine() {
         textView.text = "\t\tcase test:"
         cursorOffsetFromEnd = 0
@@ -251,7 +251,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
     
-    // MARK: - Return Key: "default"
+    // MARK: - Return Key After "default"
     func test_ReturnKeyAfterDefaultWithColon_IndentsNextLine() {
         textView.text = "\t\tdefault:"
         cursorOffsetFromEnd = 0
@@ -333,7 +333,7 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -5) // After the open bracket
     }
     
-    // MARK: - Closed Brackets: Round
+    // MARK: - Closed Round Brackets
     func test_closedRoundBracketAfterNormalCharacter_TreatedNormally() {
         textView.text = "bracket (test"
         cursorOffsetFromEnd = 0
@@ -363,7 +363,7 @@ class FormattingHelperUnitTests: XCTestCase {
     
     // TODO: Play warning sound when too many closed round brackets in the document
     
-    // MARK: - Closed Brackets: Square
+    // MARK: - Closed Square Brackets
     func test_closedSquareBracketAfterNormalCharacter_TreatedNormally() {
         textView.text = "bracket [test"
         cursorOffsetFromEnd = 0
