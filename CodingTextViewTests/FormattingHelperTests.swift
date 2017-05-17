@@ -50,6 +50,52 @@ class FormattingHelperUnitTests: XCTestCase {
         XCTAssertEqual(cursorOffsetFromEnd, -1)     // after the typed "a"
     }
     
+    // MARK: - Paste
+    func test_Paste() {
+        textView.text = "test"
+        cursorOffsetFromEnd = -1    // Before the "t"
+        textView.insertAsCode("abc")
+        
+        XCTAssertEqual(textView.text, "tesabct")     // "abc" after "tes"
+        XCTAssertEqual(cursorOffsetFromEnd, -1)     // after the pasted "abc"
+    }
+    
+    func test_PasteOverSelection() {
+        textView.text = "paste test"
+        let end = textView.endOfDocument
+        let start = textView.position(from: end, offset: -4)
+        XCTAssertNotNil(start)
+        let range = textView.textRange(from: start!, to: end)   // "test"
+        textView.selectedTextRange = range
+        textView.insertAsCode("abc")
+        
+        XCTAssertEqual(textView.text, "paste abc")     // Replaced "test" with "abc"
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    // MARK: - Backspace
+    func test_BackspaceOneCharacter() {
+        textView.text = "test"
+        cursorOffsetFromEnd = 0
+        textView.insertAsCode("")
+        
+        XCTAssertEqual(textView.text, "tes")    // Deleted last character
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
+    func test_BackspaceSelection() {    // Should also cover cut actions
+        textView.text = "backspace selection test"
+        let end = textView.endOfDocument
+        let start = textView.position(from: end, offset: -4)
+        XCTAssertNotNil(start)
+        let range = textView.textRange(from: start!, to: end)   // "test"
+        textView.selectedTextRange = range
+        textView.insertAsCode("")
+        
+        XCTAssertEqual(textView.text, "backspace selection ")   // Deleted "test"
+        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    }
+    
     // MARK: - Colon
     func test_ColonAfterCase_AdoptsSwitchIndentation() {
         textView.text = "\t\tswitch test {" +
@@ -402,29 +448,6 @@ class FormattingHelperUnitTests: XCTestCase {
         textView.insertAsCode("\"")
         
         XCTAssertEqual(textView.text, "\"test\"")   // One additional quotation mark
-        XCTAssertEqual(cursorOffsetFromEnd, 0)
-    }
-    
-    // MARK: - Backspace
-    func test_BackspaceOneCharacter() {
-        textView.text = "test"
-        cursorOffsetFromEnd = 0
-        textView.insertAsCode("")
-        
-        XCTAssertEqual(textView.text, "tes")    // Deleted last character
-        XCTAssertEqual(cursorOffsetFromEnd, 0)
-    }
-    
-    func test_BackspaceSelection() {
-        textView.text = "backspace selection test"
-        let end = textView.endOfDocument
-        let start = textView.position(from: end, offset: -4)
-        XCTAssertNotNil(start)
-        let range = textView.textRange(from: start!, to: end)   // "test"
-        textView.selectedTextRange = range
-        textView.insertAsCode("")
-        
-        XCTAssertEqual(textView.text, "backspace selection ")   // Deleted "test"
         XCTAssertEqual(cursorOffsetFromEnd, 0)
     }
 }
