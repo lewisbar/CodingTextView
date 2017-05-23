@@ -7,12 +7,12 @@
 //
 
 //  MARK: Test Naming Rule
-//  TEST_ACTION_EXPECTATION(_CONDITION)
+//  test_Action_Expectation(_Condition)
 
 import XCTest
 @testable import CodingTextView
 
-class FormattingHelperUnitTests: XCTestCase {
+class FormattingHelperTests: XCTestCase {
     
     let textView = UITextView()
     
