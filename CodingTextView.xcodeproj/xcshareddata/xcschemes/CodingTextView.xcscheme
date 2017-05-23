@@ -42,7 +42,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3043D7CC1EC63A1100ACB1E2"
+               BlueprintIdentifier = "3043D7DC1EC7A03100ACB1E2"
                BuildableName = "CodingTextViewTests.xctest"
                BlueprintName = "CodingTextViewTests"
                ReferencedContainer = "container:CodingTextView.xcodeproj">
