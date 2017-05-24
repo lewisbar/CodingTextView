@@ -3,4 +3,4 @@ osx_image: xcode8.3
 xcode_project: CodingTextView.xcodeproj
 xcode_scheme: CodingTextViewTests
 script:
-    - xcodebuild clean build test -project CodingTextView.xcodeproj -scheme CodingTextViewTests
+    - xcodebuild clean build test -sdk iphonesimulator -project CodingTextView.xcodeproj -scheme CodingTextViewTests

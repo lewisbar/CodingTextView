@@ -25,7 +25,8 @@ class FormattingHelperTests: XCTestCase {
         super.tearDown()
     }
 
-    // MARK: insertingCode(_:in:)
+    // MARK: - insertingCode(_:in:)
+    // MARK: Normal Text
     func test_NormalCharacter_InsertedNormally() {
         let text = "test"
         let selection = NSMakeRange(3, 0) // Between "s" and "t"
@@ -71,55 +72,22 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+//    // MARK: New Line
+//    func test_NewLine_MaintainsIndentation() {
+//        let text = "\t\tnormalText"
+//        let selection = NSMakeRange(4, 4) // " abc"
+//        
+//        let insertion = "er"
+//        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+//        
+//        let expectedText = "tester test"
+//        let expectedRange = NSMakeRange(6, 0) // After "tester"
+//        
+//        XCTAssertEqual(newText, expectedText)
+//        XCTAssertEqual(newRange.location, expectedRange.location)
+//        XCTAssertEqual(newRange.length, expectedRange.length)
+//    }
 
-//    
-//    // MARK: - Colon
-//    func test_ColonAfterCase_AdoptsSwitchIndentation() {
-//        textView.text = "\t\tswitch test {" +
-//                        "\n\t\t\tcase" +
-//                        "\n\t\t}"
-//        cursorOffsetFromEnd = -4    // After the open curly brace
-//        textView.insertAsCode(":")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tswitch test {" +
-//                        "\n\t\tcase:" +     // Colon after "case", one tab removed
-//                        "\n\t\t}")
-//        XCTAssertEqual(cursorOffsetFromEnd, -4) // after the typed colon
-//    }
-//    
-//    func test_ColonAfterDefault_AdoptsSwitchIndentation() {
-//        textView.text = "\t\tswitch test {" +
-//                        "\n\t\t\tdefault" +
-//                        "\n\t\t}"
-//        cursorOffsetFromEnd = -4    // After the open curly brace
-//        textView.insertAsCode(":")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tswitch test {" +
-//                        "\n\t\tdefault:" +     // Colon after "default", one tab removed
-//                        "\n\t\t}")
-//        XCTAssertEqual(cursorOffsetFromEnd, -4) // After the typed colon
-//    }
-//    
-//    func test_ColonAfterCase_TreatedNormally_IfNoSwitch() {
-//        textView.text = "\t\t\tcase"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode(":")
-//        
-//        XCTAssertEqual(textView.text, "\t\t\tcase:")    // No tabs removed
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
-//    func test_Colon_TreatedNormally_IfNoCaseOrDefault() {
-//        textView.text = "\t\t\tnormalText"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode(":")
-//        
-//        XCTAssertEqual(textView.text,
-//                       "\t\t\tnormalText:")    // No tabs removed
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
 //    
 //    // MARK: - Return Key After Normal Character
 //    func test_ReturnKeyAfterNormalCharacter_MaintainsIndentation() {
@@ -427,4 +395,54 @@ class FormattingHelperTests: XCTestCase {
 //        XCTAssertEqual(textView.text, "\"test\"")   // One additional quotation mark
 //        XCTAssertEqual(cursorOffsetFromEnd, 0)
 //    }
+    
+    
+    //
+    //    // MARK: - Colon
+    //    func test_ColonAfterCase_AdoptsSwitchIndentation() {
+    //        textView.text = "\t\tswitch test {" +
+    //                        "\n\t\t\tcase" +
+    //                        "\n\t\t}"
+    //        cursorOffsetFromEnd = -4    // After the open curly brace
+    //        textView.insertAsCode(":")
+    //
+    //        XCTAssertEqual(textView.text,
+    //                        "\t\tswitch test {" +
+    //                        "\n\t\tcase:" +     // Colon after "case", one tab removed
+    //                        "\n\t\t}")
+    //        XCTAssertEqual(cursorOffsetFromEnd, -4) // after the typed colon
+    //    }
+    //
+    //    func test_ColonAfterDefault_AdoptsSwitchIndentation() {
+    //        textView.text = "\t\tswitch test {" +
+    //                        "\n\t\t\tdefault" +
+    //                        "\n\t\t}"
+    //        cursorOffsetFromEnd = -4    // After the open curly brace
+    //        textView.insertAsCode(":")
+    //
+    //        XCTAssertEqual(textView.text,
+    //                        "\t\tswitch test {" +
+    //                        "\n\t\tdefault:" +     // Colon after "default", one tab removed
+    //                        "\n\t\t}")
+    //        XCTAssertEqual(cursorOffsetFromEnd, -4) // After the typed colon
+    //    }
+    //
+    //    func test_ColonAfterCase_TreatedNormally_IfNoSwitch() {
+    //        textView.text = "\t\t\tcase"
+    //        cursorOffsetFromEnd = 0
+    //        textView.insertAsCode(":")
+    //
+    //        XCTAssertEqual(textView.text, "\t\t\tcase:")    // No tabs removed
+    //        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    //    }
+    //
+    //    func test_Colon_TreatedNormally_IfNoCaseOrDefault() {
+    //        textView.text = "\t\t\tnormalText"
+    //        cursorOffsetFromEnd = 0
+    //        textView.insertAsCode(":")
+    //
+    //        XCTAssertEqual(textView.text,
+    //                       "\t\t\tnormalText:")    // No tabs removed
+    //        XCTAssertEqual(cursorOffsetFromEnd, 0)
+    //    }
 }
