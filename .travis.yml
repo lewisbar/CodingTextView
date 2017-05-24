@@ -2,4 +2,3 @@ language: objective-c
 osx_image: xcode8.3
 xcode_project: CodingTextView.xcodeproj
 xcode_scheme: CodingTextView
-xcode_sdk: iphonesimulator10.0
