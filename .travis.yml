@@ -2,3 +2,5 @@ language: objective-c
 osx_image: xcode8.3
 xcode_project: CodingTextView.xcodeproj
 xcode_scheme: CodingTextViewTests
+script:
+    - xcodebuild clean build -sdk iphonesimulator -project CodingTextView.xcodeproj -scheme CodingTextViewTests CODE_SIGNING_REQUIRED=NO
