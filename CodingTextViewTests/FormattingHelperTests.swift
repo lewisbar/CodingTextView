@@ -72,21 +72,23 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-//    // MARK: New Line
-//    func test_NewLine_MaintainsIndentation() {
-//        let text = "\t\tnormalText"
-//        let selection = NSMakeRange(4, 4) // " abc"
-//        
-//        let insertion = "er"
-//        let (newText, newRange) = text.insertingCode(insertion, in: selection)
-//        
-//        let expectedText = "tester test"
-//        let expectedRange = NSMakeRange(6, 0) // After "tester"
-//        
-//        XCTAssertEqual(newText, expectedText)
-//        XCTAssertEqual(newRange.location, expectedRange.location)
-//        XCTAssertEqual(newRange.length, expectedRange.length)
-//    }
+    // MARK: New Line
+    func test_NewLine_MaintainsIndentation() {
+        let text = "\t\tnormalText"
+        let selection = NSMakeRange(text.characters.count, 0) // End
+        
+        let insertion = "\n"
+        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        
+        let expectedText =
+            "\t\tnormalText" +
+            "\n\t\t"
+        let expectedRange = NSMakeRange(text.characters.count, 0) // End
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 
 //    
 //    // MARK: - Return Key After Normal Character
