@@ -16,18 +16,26 @@ extension ViewController: UITextViewDelegate {
         textView.text = newText
         textView.selectedRange = newRange
         
-//        textView.insertAsCode(text)
         return false
     }
 }
 
 extension String {
-    // MARK: New Version
+    
     func insertingCode(_ insertion: String, in range: NSRange) -> (newText: String, newRange: NSRange) {
         
         let selection = self.stringRange(from: range)
-        let newText = self.replacingCharacters(in: selection, with: insertion)
+        var insertion = insertion
+
+        if insertion == "\n" {
+            let line = rangeOfLine(around: selection.lowerBound)
+            let indentation = indentationLevel(of: line)
+            if indentation > 0 {
+                for _ in 1...indentation { insertion += "\t" }
+            }
+        }
         
+        let newText = self.replacingCharacters(in: selection, with: insertion)
         let newLocation = range.location + insertion.characters.count
         let newRange = NSMakeRange(newLocation, 0)
 
@@ -40,6 +48,56 @@ extension String {
         return start..<end
     }
     
+    func range(ofClosest text: String, before position: String.Index) -> Range<String.Index>? {
+        guard var startOfRange = self.index(position, offsetBy: -text.characters.count, limitedBy: startIndex) else { return nil }
+        var endOfRange = position
+
+        while true {
+            let range = startOfRange..<endOfRange
+            let candidate = substring(with: range)
+            if candidate == text { return range }
+            guard let newStart = self.index(startOfRange, offsetBy: -1, limitedBy: startIndex) else { return nil }
+            startOfRange = newStart
+            endOfRange = index(before: endOfRange)
+        }
+    }
+    
+    func range(ofClosest text: String, after position: String.Index) -> Range<String.Index>? {
+        guard var endOfRange = self.index(position, offsetBy: text.characters.count, limitedBy: endIndex) else { return nil }
+        var startOfRange = position
+        
+        while true {
+            let range = startOfRange..<endOfRange
+            let candidate = substring(with: range)
+            if candidate == text { return range }
+            guard let newEnd = self.index(endOfRange, offsetBy: 1, limitedBy: endIndex) else { return nil }
+            endOfRange = newEnd
+            startOfRange = index(after: startOfRange)
+        }
+    }
+    
+    func rangeOfLine(around position: String.Index) -> Range<String.Index> {
+        let startOfLine = range(ofClosest: "\n", before: position)?.upperBound ?? startIndex
+        let endOfLine = range(ofClosest: "\n", after: position)?.lowerBound ?? endIndex
+        
+        return startOfLine..<endOfLine
+    }
+    
+    private func indentationLevel(of line: Range<String.Index>) -> Int {
+        var level = 0
+        var position = line.lowerBound
+        
+        while position != line.upperBound {
+            let character = self.characters[position]
+            if character == "\t" { level += 1 }
+            position = index(after: position)
+        }
+        return level
+    }
+}
+
+
+    
 //    var counterpart: String {
 //        switch self {
 //        case "(": return ")"
@@ -51,7 +109,7 @@ extension String {
 //        default: return ""
 //        }
 //    }
-}
+//}
 
 
 

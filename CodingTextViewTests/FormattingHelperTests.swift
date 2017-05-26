@@ -14,7 +14,7 @@ import XCTest
 
 class FormattingHelperTests: XCTestCase {
     
-    let textView = UITextView()
+    // let textView = UITextView()
     
     override func setUp() {
         super.setUp()
@@ -25,6 +25,42 @@ class FormattingHelperTests: XCTestCase {
         super.tearDown()
     }
 
+    // MARK: - Helper Tests
+    // Helper methods should be made private once they pass the test
+    func test_StringRangeFromRange() {
+        let text = "0123456789"
+        let selection = NSMakeRange(1, 2)   // 1 and 2
+        let stringRange = text.stringRange(from: selection)
+        let selectedText = text.substring(with: stringRange)
+        XCTAssertEqual(selectedText, "12")
+    }
+    
+    func test_rangeOfClosestTextBeforePosition() {
+        let text = "0123...4567...89...0"
+        let position = text.index(text.startIndex, offsetBy: 15)  // Between 8 and 9
+        
+        let range = text.range(ofClosest: "...", before: position)
+        
+        let expectedStart = text.index(text.startIndex, offsetBy: 11)
+        let expectedEnd = text.index(expectedStart, offsetBy: 3)
+
+        XCTAssertEqual(range?.lowerBound, expectedStart)
+        XCTAssertEqual(range?.upperBound, expectedEnd)
+    }
+    
+    func test_rangeOfClosestTextAfterPosition() {
+        let text = "0123...4567...89...0"
+        let position = text.index(text.startIndex, offsetBy: 8)  // Between 4 and 5
+        
+        let range = text.range(ofClosest: "...", after: position)
+        
+        let expectedStart = text.index(text.startIndex, offsetBy: 11)
+        let expectedEnd = text.index(expectedStart, offsetBy: 3)
+        
+        XCTAssertEqual(range?.lowerBound, expectedStart)
+        XCTAssertEqual(range?.upperBound, expectedEnd)
+    }
+    
     // MARK: - insertingCode(_:in:)
     // MARK: Normal Text
     func test_NormalCharacter_InsertedNormally() {
@@ -72,25 +108,26 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    // MARK: New Line
+    // MARK: Indentation
     func test_NewLine_MaintainsIndentation() {
-        let text = "\t\tnormalText"
-        let selection = NSMakeRange(text.characters.count, 0) // End
+        let text =
+            "\t\t" + "test"
+        let selection = NSMakeRange(6, 0) // End
         
         let insertion = "\n"
         let (newText, newRange) = text.insertingCode(insertion, in: selection)
         
         let expectedText =
-            "\t\tnormalText" +
-            "\n\t\t"
-        let expectedRange = NSMakeRange(text.characters.count, 0) // End
+            "\t\t" + "test" + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(9, 0) // End
         
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
 
-//    
+//
 //    // MARK: - Return Key After Normal Character
 //    func test_ReturnKeyAfterNormalCharacter_MaintainsIndentation() {
 //        textView.text = "\t\tnormalText"
