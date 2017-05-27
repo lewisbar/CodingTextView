@@ -6,60 +6,10 @@
 //  Copyright © 2017 Lennart Wisbar. All rights reserved.
 //
 
-//  MARK: Test Naming Rule
-//  test_Action_Expectation(_Condition)
-
 import XCTest
 @testable import CodingTextView
 
 class FormattingHelperTests: XCTestCase {
-    
-    // let textView = UITextView()
-    
-    override func setUp() {
-        super.setUp()
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-
-    // MARK: - Helper Tests
-    // Helper methods should be made private once they pass the test
-    func test_StringRangeFromRange() {
-        let text = "0123456789"
-        let selection = NSMakeRange(1, 2)   // 1 and 2
-        let stringRange = text.stringRange(from: selection)
-        let selectedText = text.substring(with: stringRange)
-        XCTAssertEqual(selectedText, "12")
-    }
-    
-    func test_rangeOfClosestTextBeforePosition() {
-        let text = "0123...4567...89...0"
-        let position = text.index(text.startIndex, offsetBy: 15)  // Between 8 and 9
-        
-        let range = text.range(ofClosest: "...", before: position)
-        
-        let expectedStart = text.index(text.startIndex, offsetBy: 11)
-        let expectedEnd = text.index(expectedStart, offsetBy: 3)
-
-        XCTAssertEqual(range?.lowerBound, expectedStart)
-        XCTAssertEqual(range?.upperBound, expectedEnd)
-    }
-    
-    func test_rangeOfClosestTextAfterPosition() {
-        let text = "0123...4567...89...0"
-        let position = text.index(text.startIndex, offsetBy: 8)  // Between 4 and 5
-        
-        let range = text.range(ofClosest: "...", after: position)
-        
-        let expectedStart = text.index(text.startIndex, offsetBy: 11)
-        let expectedEnd = text.index(expectedStart, offsetBy: 3)
-        
-        XCTAssertEqual(range?.lowerBound, expectedStart)
-        XCTAssertEqual(range?.upperBound, expectedEnd)
-    }
     
     // MARK: - insertingCode(_:in:)
     // MARK: Normal Text
@@ -108,7 +58,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    // MARK: Indentation
+    // MARK: New Line
     func test_NewLine_MaintainsIndentation() {
         let text =
             "\t\t" + "test"
@@ -126,20 +76,27 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+    
+    func test_NewLine_AfterCurlyBrace_IndentsAndAddsClosedBrace() {
+        let text =
+            "\t\t" + "test {"
+        let selection = NSMakeRange(8, 0) // End
+        
+        let insertion = "\n"
+        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        
+        let expectedText =
+            "\t\t" + "test {" + "\n" +
+            "\t\t\t" + "\n" +
+            "\t\t" + "}"
+        let expectedRange = NSMakeRange(12, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 
 //
-//    // MARK: - Return Key After Normal Character
-//    func test_ReturnKeyAfterNormalCharacter_MaintainsIndentation() {
-//        textView.text = "\t\tnormalText"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tnormalText" +
-//                        "\n\t\t")     // Indentation level maintained
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
 //    // MARK: - Return Key After Curly Brace
 //    func test_ReturnKeyAfterCurlyBrace_IndentsNextLineAndClosesBrace() {
 //        textView.text = "\t\ttest {"
@@ -484,4 +441,69 @@ class FormattingHelperTests: XCTestCase {
     //                       "\t\t\tnormalText:")    // No tabs removed
     //        XCTAssertEqual(cursorOffsetFromEnd, 0)
     //    }
+    
+    // MARK: - Helper Tests
+    // Helper methods should be made private once they pass the test (or at least at some point in the future)
+    func test_StringRangeFromRange() {
+        let text = "0123456789"
+        let selection = NSMakeRange(1, 2)   // 1 and 2
+        let stringRange = text.stringRange(from: selection)
+        let selectedText = text.substring(with: stringRange)
+        XCTAssertEqual(selectedText, "12")
+    }
+    
+    func test_rangeOfClosestTextBeforePosition() {
+        let text = "0123...4567...89...0"
+        let position = text.index(text.startIndex, offsetBy: 15)  // Between 8 and 9
+        
+        let range = text.range(ofClosest: "...", before: position)
+        
+        let expectedStart = text.index(text.startIndex, offsetBy: 11)
+        let expectedEnd = text.index(expectedStart, offsetBy: 3)
+        
+        XCTAssertEqual(range?.lowerBound, expectedStart)
+        XCTAssertEqual(range?.upperBound, expectedEnd)
+    }
+    
+    func test_rangeOfClosestTextAfterPosition() {
+        let text = "0123...4567...89...0"
+        let position = text.index(text.startIndex, offsetBy: 8)  // Between 4 and 5
+        
+        let range = text.range(ofClosest: "...", after: position)
+        
+        let expectedStart = text.index(text.startIndex, offsetBy: 11)
+        let expectedEnd = text.index(expectedStart, offsetBy: 3)
+        
+        XCTAssertEqual(range?.lowerBound, expectedStart)
+        XCTAssertEqual(range?.upperBound, expectedEnd)
+    }
+    
+    func test_tabsForIndentationLevel() {
+        let tabs = String.tabs(3)
+        XCTAssertEqual(tabs, "\t\t\t")
+    }
+    
+    func test_insertionForInput_Normal() {
+        let (insertion, offset) = String.completedInput(for: "abc", scenario: .normal, indentation: 2)
+        let expectedInsertion = "abc"
+        let expectedOffset = 3
+        XCTAssertEqual(expectedInsertion, insertion)
+        XCTAssertEqual(expectedOffset, offset)
+    }
+    
+    func test_insertionForInput_NewLine() {
+        let (insertion, offset) = String.completedInput(for: "\n", scenario: .newLine, indentation: 2)
+        let expectedInsertion = "\n\t\t"
+        let expectedOffset = 3
+        XCTAssertEqual(expectedInsertion, insertion)
+        XCTAssertEqual(expectedOffset, offset)
+    }
+    
+    func test_insertionForInput_NewLineAfterCurlyBrace() {
+        let (insertion, offset) = String.completedInput(for: "\n", scenario: .newLineAfterCurlyBrace, indentation: 2)
+        let expectedInsertion = "\n\t\t\t\n\t\t}"
+        let expectedOffset = 4
+        XCTAssertEqual(expectedInsertion, insertion)
+        XCTAssertEqual(expectedOffset, offset)
+    }
 }

@@ -22,24 +22,74 @@ extension ViewController: UITextViewDelegate {
 
 extension String {
     
-    func insertingCode(_ insertion: String, in range: NSRange) -> (newText: String, newRange: NSRange) {
-        
+    func insertingCode(_ input: String, in range: NSRange) -> (newText: String, newRange: NSRange) {
         let selection = self.stringRange(from: range)
-        var insertion = insertion
-
-        if insertion == "\n" {
-            let line = rangeOfLine(around: selection.lowerBound)
-            let indentation = indentationLevel(of: line)
-            if indentation > 0 {
-                for _ in 1...indentation { insertion += "\t" }
+        
+        let previousPosition = index(before: selection.lowerBound)
+        let previousCharacter = self.characters[previousPosition]
+        
+        let line = rangeOfLine(around: selection.lowerBound)
+        let indentation = indentationLevel(of: line)
+        
+        var insertion = input
+        var newLocation = range.location + insertion.characters.count
+        var offset = 0
+        
+        if input == "\n" {
+            if previousCharacter == "{" {
+                (insertion, offset) = String.completedInput(for: input, scenario: .newLineAfterCurlyBrace, indentation: indentation)
+                newLocation = range.location + offset
+            } else {
+                (insertion, offset) = String.completedInput(for: input, scenario: .newLine, indentation: indentation)
+                newLocation = range.location + offset
             }
         }
         
         let newText = self.replacingCharacters(in: selection, with: insertion)
-        let newLocation = range.location + insertion.characters.count
         let newRange = NSMakeRange(newLocation, 0)
 
         return (newText: newText, newRange: newRange)
+    }
+    
+    enum Scenario {
+        case normal
+        case newLine
+        case newLineAfterCurlyBrace
+    }
+    
+    static func tabs(_ number: Int) -> String {
+        var tabs = ""
+        if number > 0 {
+            for _ in 1...number {
+                tabs += "\t"
+            }
+        }
+        return tabs
+    }
+    
+    static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
+        var insertion = ""
+        var cursorOffset = 0
+        
+        switch scenario {
+        case .normal:
+            insertion = input
+            cursorOffset = input.characters.count
+        case .newLine:
+            let completion = tabs(indentation)
+            insertion = input + completion
+            cursorOffset = input.characters.count + completion.characters.count
+        case .newLineAfterCurlyBrace:
+            var completion = tabs(indentation + 1)
+            completion += "\n"
+            completion += tabs(indentation)
+            completion += "}"
+            insertion = input + completion
+            cursorOffset = input.characters.count + indentation + 1
+            
+        }
+        
+        return (insertion, cursorOffset: cursorOffset)
     }
     
     func stringRange(from range: NSRange) -> Range<String.Index> {
