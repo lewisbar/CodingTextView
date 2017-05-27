@@ -95,32 +95,29 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+    
+    func test_newLine_BetweenCurlyBraces_UsesExistingBrace() {
+        let text =
+            "\t\t" + "test {}"
+        let selection = NSMakeRange(8, 0) // Between the braces
+        
+        let insertion = "\n"
+        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        
+        let expectedText =
+            "\t\t" + "test {" + "\n" +
+                "\t\t\t" + "\n" +
+                "\t\t" + "}"
+        let expectedRange = NSMakeRange(12, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 
 //
 //    // MARK: - Return Key After Curly Brace
-//    func test_ReturnKeyAfterCurlyBrace_IndentsNextLineAndClosesBrace() {
-//        textView.text = "\t\ttest {"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\ttest {" +
-//                        "\n\t\t\t" +    // Indentation level maintained
-//                        "\n\t\t}")     // Closed curly brace added
-//        XCTAssertEqual(cursorOffsetFromEnd, -4) // End of the middle line
-//    }
-//    
-//    func test_ReturnKeyBetweenCurlyBraces_UsesExistingBrace() {
-//        textView.text = "\t\ttest {}"
-//        cursorOffsetFromEnd = -1    // Between the {}
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\ttest {" +
-//                        "\n\t\t\t" +    // Indentation level maintained
-//                        "\n\t\t}")      // No curly brace added
-//        XCTAssertEqual(cursorOffsetFromEnd, -4) // End of the middle line
-//    }
+//
 //    
 //    func test_ReturnKeyAfterCurlyBrace_DoesNotAddAnotherBrace_IfTooManyClosedBraces() {
 //        textView.text = "test {" +
@@ -452,7 +449,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(selectedText, "12")
     }
     
-    func test_rangeOfClosestTextBeforePosition() {
+    func test_RangeOfClosestTextBeforePosition() {
         let text = "0123...4567...89...0"
         let position = text.index(text.startIndex, offsetBy: 15)  // Between 8 and 9
         
@@ -465,7 +462,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(range?.upperBound, expectedEnd)
     }
     
-    func test_rangeOfClosestTextAfterPosition() {
+    func test_RangeOfClosestTextAfterPosition() {
         let text = "0123...4567...89...0"
         let position = text.index(text.startIndex, offsetBy: 8)  // Between 4 and 5
         
@@ -478,12 +475,12 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(range?.upperBound, expectedEnd)
     }
     
-    func test_tabsForIndentationLevel() {
+    func test_Tabs() {
         let tabs = String.tabs(3)
         XCTAssertEqual(tabs, "\t\t\t")
     }
     
-    func test_insertionForInput_Normal() {
+    func test_InsertionForInput_Normal() {
         let (insertion, offset) = String.completedInput(for: "abc", scenario: .normal, indentation: 2)
         let expectedInsertion = "abc"
         let expectedOffset = 3
@@ -491,7 +488,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(expectedOffset, offset)
     }
     
-    func test_insertionForInput_NewLine() {
+    func test_InsertionForInput_NewLine() {
         let (insertion, offset) = String.completedInput(for: "\n", scenario: .newLine, indentation: 2)
         let expectedInsertion = "\n\t\t"
         let expectedOffset = 3
@@ -499,11 +496,40 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(expectedOffset, offset)
     }
     
-    func test_insertionForInput_NewLineAfterCurlyBrace() {
+    func test_InsertionForInput_NewLineAfterCurlyBrace() {
         let (insertion, offset) = String.completedInput(for: "\n", scenario: .newLineAfterCurlyBrace, indentation: 2)
         let expectedInsertion = "\n\t\t\t\n\t\t}"
         let expectedOffset = 4
         XCTAssertEqual(expectedInsertion, insertion)
         XCTAssertEqual(expectedOffset, offset)
+    }
+    
+    func test_CharacterBefore() {
+        let text = "abc"
+        let position = text.index(text.startIndex, offsetBy: 2)  // Between b and c
+        let character = text.character(before: position)
+        let expectedCharacter: Character = "b"
+        XCTAssertEqual(expectedCharacter, character!)
+    }
+    
+    func test_CharacterBeforeStart_ReturnsNil() {
+        let text = "abc"
+        let character = text.character(before: text.startIndex)
+        XCTAssertNil(character)
+    }
+    
+    func test_CharacterAt() {
+        let text = "abc"
+        let position = text.index(text.startIndex, offsetBy: 2)  // Between b and c
+        let character = text.character(at: position)
+        let expectedCharacter: Character = "c"
+        XCTAssertEqual(expectedCharacter, character)
+    }
+    
+    func test_CharacterAtEnd_ReturnsNil() {
+        let text = "abc"
+        let position = text.index(text.startIndex, offsetBy: 3)  // After c
+        let character = text.character(at: position)
+        XCTAssertNil(character)
     }
 }
