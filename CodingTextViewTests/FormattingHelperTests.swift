@@ -106,8 +106,28 @@ class FormattingHelperTests: XCTestCase {
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
-                "\t\t\t" + "\n" +
-                "\t\t" + "}"
+            "\t\t\t" + "\n" +
+            "\t\t" + "}"
+        let expectedRange = NSMakeRange(12, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_newLine_AfterCurlyBrace_IndentsWithoutAddingClosedBrace_IfTooManyClosedBraces() {
+        let text =
+            "\t\t" + "test {" + "\n" +
+            "another line }"
+        let selection = NSMakeRange(8, 0) // After open curly brace
+        
+        let insertion = "\n"
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        
+        let expectedText =
+            "\t\t" + "test {" + "\n" +
+            "\t\t\t" + "\n" +
+            "another line }"
         let expectedRange = NSMakeRange(12, 0) // End of second line
         
         XCTAssertEqual(newText, expectedText)
