@@ -33,7 +33,6 @@ extension String {
         let indentation = indentationLevel(of: line)
         
         var insertion = input
-        var newLocation = range.location
         var cursorOffset = insertion.characters.count
         var scenario = Scenario.normal
         
@@ -51,7 +50,7 @@ extension String {
         
         (insertion, cursorOffset) = String.completedInput(for: input, scenario: scenario, indentation: indentation)
         let newText = self.replacingCharacters(in: selection, with: insertion)
-        newLocation = range.location + cursorOffset
+        let newLocation = range.location + cursorOffset
         let newRange = NSMakeRange(newLocation, 0)
 
         return (newText: newText, newRange: newRange)
