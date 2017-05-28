@@ -40,6 +40,8 @@ extension String {
             if previousCharacter == "{" {
                 if nextCharacter == "}" {
                     scenario = .newLineBetweenCurlyBraces
+                } else if number(of: "}") >= number(of: "{") {
+                    scenario = .newLineAfterCurlyBraceAlreadyClosed
                 } else {
                     scenario = .newLineAfterCurlyBrace
                 }
@@ -49,6 +51,7 @@ extension String {
         }
         
         (insertion, cursorOffset) = String.completedInput(for: input, scenario: scenario, indentation: indentation)
+        
         let newText = self.replacingCharacters(in: selection, with: insertion)
         let newLocation = range.location + cursorOffset
         let newRange = NSMakeRange(newLocation, 0)
@@ -62,6 +65,7 @@ extension String {
         case newLine
         case newLineAfterCurlyBrace
         case newLineBetweenCurlyBraces
+        case newLineAfterCurlyBraceAlreadyClosed
     }
 
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
@@ -75,7 +79,7 @@ extension String {
         case .newLine:
             let completion = tabs(for: indentation)
             insertion = input + completion
-            cursorOffset = input.characters.count + completion.characters.count
+            cursorOffset = insertion.characters.count
         case .newLineAfterCurlyBrace:
             var completion = tabs(for: indentation + 1)
             completion += "\n"
@@ -89,6 +93,10 @@ extension String {
             completion += tabs(for: indentation)
             insertion = input + completion
             cursorOffset = input.characters.count + indentation + 1
+        case .newLineAfterCurlyBraceAlreadyClosed:
+            let completion = tabs(for: indentation + 1)
+            insertion = input + completion
+            cursorOffset = insertion.characters.count
         }
         
         return (insertion, cursorOffset: cursorOffset)
@@ -160,6 +168,16 @@ extension String {
             return characters[newPosition]
         }
         return nil
+    }
+    
+    func number(of string: String, in range: Range<String.Index>) -> Int {
+        let split = components(separatedBy: string)
+        return split.count-1
+    }
+    
+    func number(of string: String) -> Int {
+        let range = startIndex..<endIndex
+        return number(of: string, in: range)
     }
     
     static func tabs(for indentation: Int) -> String {
