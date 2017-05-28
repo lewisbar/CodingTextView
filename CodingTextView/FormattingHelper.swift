@@ -12,7 +12,7 @@ extension ViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         
-        let (newText, newRange) = textView.text.insertingCode(text, in: range)
+        let (newText, newRange) = textView.text.completedTextInput(for: text, in: range)
         textView.text = newText
         textView.selectedRange = newRange
         
@@ -21,8 +21,8 @@ extension ViewController: UITextViewDelegate {
 }
 
 extension String {
-    
-    func insertingCode(_ input: String, in range: NSRange) -> (newText: String, newRange: NSRange) {
+    // MARK: Internal Interface
+    func completedTextInput(for input: String, in range: NSRange) -> (newText: String, newRange: NSRange) {
         
         let selection = self.stringRange(from: range)
         
@@ -34,20 +34,20 @@ extension String {
         
         var insertion = input
         var newLocation = range.location + insertion.characters.count
-        var offset = 0
+        var cursorOffset = 0
         
         if input == "\n" {
             if previousCharacter == "{" {
                 if nextCharacter == "}" {
-                    (insertion, offset) = String.completedInput(for: input, scenario: .newLineBetweenCurlyBraces, indentation: indentation)
-                    newLocation = range.location + offset
+                    (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLineBetweenCurlyBraces, indentation: indentation)
+                    newLocation = range.location + cursorOffset
                 } else {
-                    (insertion, offset) = String.completedInput(for: input, scenario: .newLineAfterCurlyBrace, indentation: indentation)
-                    newLocation = range.location + offset
+                    (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLineAfterCurlyBrace, indentation: indentation)
+                    newLocation = range.location + cursorOffset
                 }
             } else {
-                (insertion, offset) = String.completedInput(for: input, scenario: .newLine, indentation: indentation)
-                newLocation = range.location + offset
+                (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLine, indentation: indentation)
+                newLocation = range.location + cursorOffset
             }
         }
         
@@ -57,6 +57,7 @@ extension String {
         return (newText: newText, newRange: newRange)
     }
     
+    // MARK: Private Implementation (yet to be marked as private once this file is done, maybe put in a private String extension)
     enum Scenario {
         case normal
         case newLine
@@ -73,20 +74,20 @@ extension String {
             insertion = input
             cursorOffset = input.characters.count
         case .newLine:
-            let completion = tabs(indentation)
+            let completion = tabs(for: indentation)
             insertion = input + completion
             cursorOffset = input.characters.count + completion.characters.count
         case .newLineAfterCurlyBrace:
-            var completion = tabs(indentation + 1)
+            var completion = tabs(for: indentation + 1)
             completion += "\n"
-            completion += tabs(indentation)
+            completion += tabs(for: indentation)
             completion += "}"
             insertion = input + completion
             cursorOffset = input.characters.count + indentation + 1
         case .newLineBetweenCurlyBraces:
-            var completion = tabs(indentation + 1)
+            var completion = tabs(for: indentation + 1)
             completion += "\n"
-            completion += tabs(indentation)
+            completion += tabs(for: indentation)
             insertion = input + completion
             cursorOffset = input.characters.count + indentation + 1
         }
@@ -147,17 +148,6 @@ extension String {
         return level
     }
     
-    
-    static func tabs(_ number: Int) -> String {
-        var tabs = ""
-        if number > 0 {
-            for _ in 1...number {
-                tabs += "\t"
-            }
-        }
-        return tabs
-    }
-    
     func character(at position: String.Index) -> Character? {
         if position < endIndex {
             return characters[position]
@@ -171,6 +161,16 @@ extension String {
             return characters[newPosition]
         }
         return nil
+    }
+    
+    static func tabs(for indentation: Int) -> String {
+        var tabs = ""
+        if indentation > 0 {
+            for _ in 1...indentation {
+                tabs += "\t"
+            }
+        }
+        return tabs
     }
 }
 

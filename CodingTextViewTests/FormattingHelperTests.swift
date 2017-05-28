@@ -476,7 +476,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_Tabs() {
-        let tabs = String.tabs(3)
+        let tabs = String.tabs(for: 3)
         XCTAssertEqual(tabs, "\t\t\t")
     }
     
