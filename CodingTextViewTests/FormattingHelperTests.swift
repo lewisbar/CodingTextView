@@ -11,14 +11,14 @@ import XCTest
 
 class FormattingHelperTests: XCTestCase {
     
-    // MARK: - insertingCode(_:in:)
+    // MARK: - completedTextInput(for:in:)
     // MARK: Normal Text
     func test_NormalCharacter_InsertedNormally() {
         let text = "test"
         let selection = NSMakeRange(3, 0) // Between "s" and "t"
         
         let insertion = "a"
-        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
         
         let expectedText = "tesat"
         let expectedRange = NSMakeRange(4, 0) // Between "a" and "t"
@@ -33,7 +33,7 @@ class FormattingHelperTests: XCTestCase {
         let selection = NSMakeRange(3, 0) // Between "s" and "t"
 
         let insertion = "abc"
-        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
         
         let expectedText = "tesabct"
         let expectedRange = NSMakeRange(6, 0) // Between "c" and "t"
@@ -48,7 +48,7 @@ class FormattingHelperTests: XCTestCase {
         let selection = NSMakeRange(4, 4) // " abc"
         
         let insertion = "er"
-        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
         
         let expectedText = "tester test"
         let expectedRange = NSMakeRange(6, 0) // After "tester"
@@ -65,7 +65,7 @@ class FormattingHelperTests: XCTestCase {
         let selection = NSMakeRange(6, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
         
         let expectedText =
             "\t\t" + "test" + "\n" +
@@ -83,7 +83,7 @@ class FormattingHelperTests: XCTestCase {
         let selection = NSMakeRange(8, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
@@ -102,7 +102,7 @@ class FormattingHelperTests: XCTestCase {
         let selection = NSMakeRange(8, 0) // Between the braces
         
         let insertion = "\n"
-        let (newText, newRange) = text.insertingCode(insertion, in: selection)
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
