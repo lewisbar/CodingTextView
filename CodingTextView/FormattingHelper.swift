@@ -33,25 +33,23 @@ extension String {
         let indentation = indentationLevel(of: line)
         
         var insertion = input
-        var newLocation = range.location + insertion.characters.count
-        var cursorOffset = 0
+        var newLocation = range.location
+        var cursorOffset = insertion.characters.count
         
         if input == "\n" {
             if previousCharacter == "{" {
                 if nextCharacter == "}" {
                     (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLineBetweenCurlyBraces, indentation: indentation)
-                    newLocation = range.location + cursorOffset
                 } else {
                     (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLineAfterCurlyBrace, indentation: indentation)
-                    newLocation = range.location + cursorOffset
                 }
             } else {
                 (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLine, indentation: indentation)
-                newLocation = range.location + cursorOffset
             }
         }
         
         let newText = self.replacingCharacters(in: selection, with: insertion)
+        newLocation = range.location + cursorOffset
         let newRange = NSMakeRange(newLocation, 0)
 
         return (newText: newText, newRange: newRange)
