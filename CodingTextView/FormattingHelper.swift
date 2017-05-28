@@ -35,19 +35,21 @@ extension String {
         var insertion = input
         var newLocation = range.location
         var cursorOffset = insertion.characters.count
+        var scenario = Scenario.normal
         
         if input == "\n" {
             if previousCharacter == "{" {
                 if nextCharacter == "}" {
-                    (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLineBetweenCurlyBraces, indentation: indentation)
+                    scenario = .newLineBetweenCurlyBraces
                 } else {
-                    (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLineAfterCurlyBrace, indentation: indentation)
+                    scenario = .newLineAfterCurlyBrace
                 }
             } else {
-                (insertion, cursorOffset) = String.completedInput(for: input, scenario: .newLine, indentation: indentation)
+                scenario = .newLine
             }
         }
         
+        (insertion, cursorOffset) = String.completedInput(for: input, scenario: scenario, indentation: indentation)
         let newText = self.replacingCharacters(in: selection, with: insertion)
         newLocation = range.location + cursorOffset
         let newRange = NSMakeRange(newLocation, 0)
