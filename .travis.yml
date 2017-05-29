@@ -1,6 +1,6 @@
 language: objective-c
 osx_image: xcode8.3
-xcode_project: CodingTextView.xcodeproj
-xcode_scheme: CodingTextViewTests
+#xcode_project: CodingTextView.xcodeproj
+#xcode_scheme: CodingTextViewTests
 script:
     - xcodebuild clean build test -sdk iphonesimulator -project CodingTextView.xcodeproj -scheme CodingTextViewTests -destination 'platform=iOS Simulator,name=iPhone 7'
