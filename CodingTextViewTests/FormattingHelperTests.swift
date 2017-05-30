@@ -173,7 +173,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_newLine_AfterCurlyBraceAfterSwitch_NoBraceOrIndentationAdded_IfTooManyClosedBraces() {
+    func test_NewLine_AfterCurlyBraceAfterSwitch_NoBraceOrIndentationAdded_IfTooManyClosedBraces() {
         let text =
             "\t\t" + "switch test {" + "\n" +
             "another line }"
@@ -188,6 +188,36 @@ class FormattingHelperTests: XCTestCase {
             "another line }"
         let expectedRange = NSMakeRange(18, 0) // End of second line
         
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterColon_BehavesNormally() {
+        let text = "\t\t" + "test:"
+        let range = NSMakeRange(7, 0) // After colon
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test:" + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(10, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterColonAfterCase_Indents() {
+        let text = "\t\t" + "case test:"
+        let range = NSMakeRange(12, 0) // After colon
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "case test:" + "\n" +
+            "\t\t\t"
+        let expectedRange = NSMakeRange(16, 0) // End
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
@@ -531,7 +561,10 @@ class FormattingHelperTests: XCTestCase {
     func test_StringRangeFromRange() {
         let text = "0123456789"
         let range = NSMakeRange(1, 2)   // 1 and 2
-        let stringRange = text.stringRange(from: range)
+        guard let stringRange = text.stringRange(from: range) else {
+            XCTFail("stringRange should not be nil")
+            return
+        }
         let selectedText = text.substring(with: stringRange)
         XCTAssertEqual(selectedText, "12")
     }

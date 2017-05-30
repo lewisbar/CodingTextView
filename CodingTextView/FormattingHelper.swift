@@ -24,7 +24,7 @@ struct FormattingHelper {
     // MARK: Internal Interface
     static func completedTextInput(for input: String, in text: String, range: NSRange) -> (newText: String, newRange: NSRange) {
         
-        let selection = text.stringRange(from: range)
+        guard let selection = text.stringRange(from: range) else { return (text, range) }
         
         let previousCharacter = text.character(before: selection.lowerBound, ignoring: [" "])
         let nextCharacter = text.character(at: selection.lowerBound, ignoring: [" "])
@@ -56,6 +56,8 @@ struct FormattingHelper {
                         scenario = .newLineAfterCurlyBrace
                     }
                 }
+            } else if previousCharacter == ":", trimmedLine.hasPrefix("case") {
+                scenario = .newLineAfterColonAfterCase
             } else {
                 scenario = .newLine
             }
@@ -81,6 +83,7 @@ struct FormattingHelper {
         case newLineAfterCurlyBraceAfterSwitch
         case newLineBetweenCurlyBracesAfterSwitch
         case newLineAfterCurlyBraceAlreadyClosedAfterSwitch
+        case newLineAfterColonAfterCase
     }
     
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
@@ -90,7 +93,7 @@ struct FormattingHelper {
         switch scenario {
         case .normal:
             insertion = input
-            cursorOffset = input.characters.count
+            cursorOffset = insertion.characters.count
         case .newLine:
             let completion = tabs(for: indentation)
             insertion = input + completion
@@ -129,6 +132,10 @@ struct FormattingHelper {
             let completion = tabs(for: indentation)
             insertion = input + completion
             cursorOffset = insertion.characters.count
+        case .newLineAfterColonAfterCase:
+            let completion = tabs(for: indentation + 1)
+            insertion = input + completion
+            cursorOffset = insertion.characters.count
         }
         
         return (insertion, cursorOffset: cursorOffset)
@@ -148,7 +155,8 @@ struct FormattingHelper {
 // TODO: Mark as private
 extension String {
 
-    func stringRange(from range: NSRange) -> Range<String.Index> {
+    func stringRange(from range: NSRange) -> Range<String.Index>? {
+        guard (range.location + range.length) <= characters.count else { return nil }
         let start = self.index(self.startIndex, offsetBy: range.location)
         let end = self.index(start, offsetBy: range.length)
         return start..<end
