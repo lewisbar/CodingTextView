@@ -15,13 +15,13 @@ class FormattingHelperTests: XCTestCase {
     // MARK: Normal Text
     func test_NormalCharacter_InsertedNormally() {
         let text = "test"
-        let selection = NSMakeRange(3, 0) // Between "s" and "t"
+        let selection = NSMakeRange(3, 0) // "t"
         
         let insertion = "a"
         let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
         
         let expectedText = "tesat"
-        let expectedRange = NSMakeRange(4, 0) // Between "a" and "t"
+        let expectedRange = NSMakeRange(4, 0) // "t"
         
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -30,13 +30,13 @@ class FormattingHelperTests: XCTestCase {
     
     func test_NormalText_InsertedNormally() {
         let text = "test"
-        let selection = NSMakeRange(3, 0) // Between "s" and "t"
+        let selection = NSMakeRange(3, 0) // "t"
 
         let insertion = "abc"
         let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
         
         let expectedText = "tesabct"
-        let expectedRange = NSMakeRange(6, 0) // Between "c" and "t"
+        let expectedRange = NSMakeRange(6, 0) // "t"
         
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -99,7 +99,7 @@ class FormattingHelperTests: XCTestCase {
     func test_newLine_BetweenCurlyBraces_UsesExistingBrace() {
         let text =
             "\t\t" + "test {}"
-        let selection = NSMakeRange(8, 0) // Between the braces
+        let selection = NSMakeRange(8, 0) // Closed brace
         
         let insertion = "\n"
         let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
@@ -157,7 +157,7 @@ class FormattingHelperTests: XCTestCase {
     func test_NewLine_BetweenCurlyBracesAfterSwitch_UsesExistingCurlyBraceWithoutIndenting() {
         let text =
             "\t\t" + "switch test {}"
-        let selection = NSMakeRange(15, 0) // Between the braces
+        let selection = NSMakeRange(15, 0) // Closed brace
         
         let insertion = "\n"
         let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
@@ -568,9 +568,9 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_CharacterBefore() {
-        let text = "abc"
-        let position = text.index(text.startIndex, offsetBy: 2)  // Between b and c
-        let character = text.character(before: position)
+        let text = "ab c"
+        let position = text.index(text.startIndex, offsetBy: 3)  // Before c
+        let character = text.character(before: position, ignoring: [" "])
         let expectedCharacter: Character = "b"
         XCTAssertEqual(expectedCharacter, character!)
     }
@@ -582,9 +582,9 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_CharacterAt() {
-        let text = "abc"
-        let position = text.index(text.startIndex, offsetBy: 2)  // Between b and c
-        let character = text.character(at: position)
+        let text = "ab c"
+        let position = text.index(text.startIndex, offsetBy: 2)  // After b
+        let character = text.character(at: position, ignoring: [" "])
         let expectedCharacter: Character = "c"
         XCTAssertEqual(expectedCharacter, character)
     }

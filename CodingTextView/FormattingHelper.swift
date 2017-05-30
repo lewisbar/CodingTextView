@@ -26,10 +26,11 @@ extension String {
         
         let selection = self.stringRange(from: range)
         
-        let previousCharacter = character(before: selection.lowerBound)
-        let nextCharacter = character(at: selection.lowerBound)
+        let previousCharacter = character(before: selection.lowerBound, ignoring: [" "])
+        let nextCharacter = character(at: selection.lowerBound, ignoring: [" "])
         
         let line = rangeOfLine(around: selection.lowerBound)
+        let trimmedLine = substring(with: line).trimmingCharacters(in: .whitespaces)
         let indentation = indentationLevel(of: line)
         
         var insertion = input
@@ -37,7 +38,6 @@ extension String {
         var scenario = Scenario.normal
         
         if input == "\n" {
-            let trimmedLine = substring(with: line).trimmingCharacters(in: .whitespaces)
             if previousCharacter == "{" {
                 if trimmedLine.hasPrefix("switch") {
                     if nextCharacter == "}" {
@@ -186,17 +186,26 @@ extension String {
         return level
     }
     
-    func character(at position: String.Index) -> Character? {
-        if position < endIndex {
-            return characters[position]
+    func character(at position: String.Index, ignoring: [Character] = []) -> Character? {
+        var position = position
+        
+        while position < endIndex {
+            if !ignoring.contains(characters[position]) {
+                return characters[position]
+            }
+            position = index(after: position)
         }
         return nil
     }
     
-    func character(before position: String.Index) -> Character? {
-        if position > startIndex {
-            let newPosition = index(before: position)
-            return characters[newPosition]
+    func character(before position: String.Index, ignoring: [Character] = []) -> Character? {
+        var position = position
+        
+        while position > startIndex {
+            position = index(before: position)
+            if !ignoring.contains(characters[position]) {
+                return characters[position]
+            }
         }
         return nil
     }
