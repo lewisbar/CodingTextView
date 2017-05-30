@@ -135,34 +135,67 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
 
+    func test_newLine_AfterCurlyBraceAfterSwitch_AddsClosedBraceWithoutIndenting() {
+        let text =
+            "\t\t" + "switch test {"
+        let selection = NSMakeRange(15, 0) // End
+        
+        let insertion = "\n"
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        
+        let expectedText =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t" + "\n" +
+            "\t\t" + "}"
+        let expectedRange = NSMakeRange(18, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_BetweenCurlyBracesAfterSwitch_UsesExistingCurlyBraceWithoutIndenting() {
+        let text =
+            "\t\t" + "switch test {}"
+        let selection = NSMakeRange(15, 0) // Between the braces
+        
+        let insertion = "\n"
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        
+        let expectedText =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t" + "\n" +
+            "\t\t" + "}"
+        let expectedRange = NSMakeRange(18, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_newLine_AfterCurlyBraceAfterSwitch_NoBraceOrIndentationAdded_IfTooManyClosedBraces() {
+        let text =
+            "\t\t" + "switch test {" + "\n" +
+            "another line }"
+        let selection = NSMakeRange(15, 0) // After open curly brace
+        
+        let insertion = "\n"
+        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        
+        let expectedText =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t" + "\n" +
+            "another line }"
+        let expectedRange = NSMakeRange(18, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 //
 //    // MARK: - Return Key After Curly Brace
 //
 //    
-//    func test_ReturnKeyAfterCurlyBrace_DoesNotAddAnotherBrace_IfTooManyClosedBraces() {
-//        textView.text = "test {" +
-//                        "\nanother line }"
-//        cursorOffsetFromEnd = -15   // After the open curly brace
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "test {" +
-//                        "\n\t" +    // Indentation works as normal after "{"
-//                        "\nanother line }") // No extra "}" added
-//        XCTAssertEqual(cursorOffsetFromEnd, -15)    // End of the middle line
-//    }
-//    
-//    func test_ReturnKeyAfterSwitchWithCurlyBrace_MaintainsIndentationAndClosesBrace() {
-//        textView.text = "\t\tswitch test {"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tswitch test {" +
-//                        "\n\t\t" +    // Indentation level maintained
-//                        "\n\t\t}")     // Closed curly brace added
-//        XCTAssertEqual(cursorOffsetFromEnd, -4) // End of the middle line
-//    }
 //    
 //    // MARK: - Return Key after "case"
 //    func test_ReturnKeyAfterCaseWithColon_IndentsNextLine() {

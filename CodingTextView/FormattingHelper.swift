@@ -28,7 +28,7 @@ extension String {
         
         let previousCharacter = character(before: selection.lowerBound)
         let nextCharacter = character(at: selection.lowerBound)
-
+        
         let line = rangeOfLine(around: selection.lowerBound)
         let indentation = indentationLevel(of: line)
         
@@ -37,13 +37,24 @@ extension String {
         var scenario = Scenario.normal
         
         if input == "\n" {
+            let trimmedLine = substring(with: line).trimmingCharacters(in: .whitespaces)
             if previousCharacter == "{" {
-                if nextCharacter == "}" {
-                    scenario = .newLineBetweenCurlyBraces
-                } else if number(of: "}") >= number(of: "{") {
-                    scenario = .newLineAfterCurlyBraceAlreadyClosed
+                if trimmedLine.hasPrefix("switch") {
+                    if nextCharacter == "}" {
+                        scenario = .newLineBetweenCurlyBracesAfterSwitch
+                    } else if number(of: "}") >= number(of: "{") {
+                        scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
+                    } else {
+                        scenario = .newLineAfterCurlyBraceAfterSwitch
+                    }
                 } else {
-                    scenario = .newLineAfterCurlyBrace
+                    if nextCharacter == "}" {
+                        scenario = .newLineBetweenCurlyBraces
+                    } else if number(of: "}") >= number(of: "{") {
+                        scenario = .newLineAfterCurlyBraceAlreadyClosed
+                    } else {
+                        scenario = .newLineAfterCurlyBrace
+                    }
                 }
             } else {
                 scenario = .newLine
@@ -66,6 +77,9 @@ extension String {
         case newLineAfterCurlyBrace
         case newLineBetweenCurlyBraces
         case newLineAfterCurlyBraceAlreadyClosed
+        case newLineAfterCurlyBraceAfterSwitch
+        case newLineBetweenCurlyBracesAfterSwitch
+        case newLineAfterCurlyBraceAlreadyClosedAfterSwitch
     }
 
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
@@ -95,6 +109,23 @@ extension String {
             cursorOffset = input.characters.count + indentation + 1
         case .newLineAfterCurlyBraceAlreadyClosed:
             let completion = tabs(for: indentation + 1)
+            insertion = input + completion
+            cursorOffset = insertion.characters.count
+        case .newLineAfterCurlyBraceAfterSwitch:
+            var completion = tabs(for: indentation)
+            completion += "\n"
+            completion += tabs(for: indentation)
+            completion += "}"
+            insertion = input + completion
+            cursorOffset = input.characters.count + indentation
+        case .newLineBetweenCurlyBracesAfterSwitch:
+            var completion = tabs(for: indentation)
+            completion += "\n"
+            completion += tabs(for: indentation)
+            insertion = input + completion
+            cursorOffset = input.characters.count + indentation
+        case .newLineAfterCurlyBraceAlreadyClosedAfterSwitch:
+            let completion = tabs(for: indentation)
             insertion = input + completion
             cursorOffset = insertion.characters.count
         }
