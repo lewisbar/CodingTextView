@@ -56,8 +56,9 @@ struct FormattingHelper {
                         scenario = .newLineAfterCurlyBrace
                     }
                 }
-            } else if previousCharacter == ":", trimmedLine.hasPrefix("case") {
-                scenario = .newLineAfterColonAfterCase
+            } else if previousCharacter == ":",
+                (trimmedLine.hasPrefix("case") || trimmedLine.hasPrefix("default")) {
+                scenario = .newLineAfterColonAfterCaseOrDefault
             } else {
                 scenario = .newLine
             }
@@ -83,7 +84,7 @@ struct FormattingHelper {
         case newLineAfterCurlyBraceAfterSwitch
         case newLineBetweenCurlyBracesAfterSwitch
         case newLineAfterCurlyBraceAlreadyClosedAfterSwitch
-        case newLineAfterColonAfterCase
+        case newLineAfterColonAfterCaseOrDefault
     }
     
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
@@ -132,7 +133,7 @@ struct FormattingHelper {
             let completion = tabs(for: indentation)
             insertion = input + completion
             cursorOffset = insertion.characters.count
-        case .newLineAfterColonAfterCase:
+        case .newLineAfterColonAfterCaseOrDefault:
             let completion = tabs(for: indentation + 1)
             insertion = input + completion
             cursorOffset = insertion.characters.count

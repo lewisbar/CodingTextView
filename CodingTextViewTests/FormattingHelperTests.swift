@@ -11,7 +11,7 @@ import XCTest
 
 class FormattingHelperTests: XCTestCase {
     
-    // MARK: - completedTextInput(for:in:)
+    // MARK: - completedTextInput(for:in:range:)
     // MARK: Normal Text
     func test_NormalCharacter_InsertedNormally() {
         let text = "test"
@@ -208,6 +208,21 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterCaseWithoutColon_BehavesNormally() {
+        let text = "\t\t" + "case test"
+        let range = NSMakeRange(11, 0) // End
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "case test" + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(14, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterColonAfterCase_Indents() {
         let text = "\t\t" + "case test:"
         let range = NSMakeRange(12, 0) // After colon
@@ -222,33 +237,26 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+    
+    func test_NewLine_AfterColonAfterDefault_Indents() {
+        let text = "\t\t" + "default:"
+        let range = NSMakeRange(10, 0) // After colon
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "default:" + "\n" +
+            "\t\t\t"
+        let expectedRange = NSMakeRange(14, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    
 //
 //    // MARK: - Return Key After Curly Brace
-//
-//    
-//    
-//    // MARK: - Return Key after "case"
-//    func test_ReturnKeyAfterCaseWithColon_IndentsNextLine() {
-//        textView.text = "\t\tcase test:"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tcase test:" +
-//                        "\n\t\t\t")     // Indentation level raised
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
-//    func test_ReturnKeyAfterCaseWithColonAndSpaces_IndentsNextLine() {
-//        textView.text = "\t\tcase test:   "
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tcase test:   " +
-//                        "\n\t\t\t")     // Indentation level raised
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
+
 //    
 //    func test_ReturnKeyAfterCaseWithoutColon_DoesNotIndentNextLine() {
 //        textView.text = "\t\tcase test"
