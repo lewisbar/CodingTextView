@@ -273,17 +273,6 @@ class FormattingHelperTests: XCTestCase {
 //    // MARK: - Return Key After Curly Brace
 
 //    
-//    func test_ReturnKeyAfterCaseWithoutColon_DoesNotIndentNextLine() {
-//        textView.text = "\t\tcase test"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tcase test" +
-//                        "\n\t\t")     // Indentation level maintained
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
 //    func test_ReturnKeyAfterCaseWithTextAfterColon_DoesNotIndentNextLine() {
 //        textView.text = "\t\tcase test: text"
 //        cursorOffsetFromEnd = 0
@@ -296,16 +285,7 @@ class FormattingHelperTests: XCTestCase {
 //    }
 //    
 //    // MARK: - Return Key After "default"
-//    func test_ReturnKeyAfterDefaultWithColon_IndentsNextLine() {
-//        textView.text = "\t\tdefault:"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tdefault:" +
-//                        "\n\t\t\t")     // Indentation level raised
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
+//
 //    
 //    func test_ReturnKeyAfterDefaultWithColonAndSpaces_IndentsNextLine() {
 //        textView.text = "\t\tdefault:   "
@@ -318,16 +298,6 @@ class FormattingHelperTests: XCTestCase {
 //        XCTAssertEqual(cursorOffsetFromEnd, 0)
 //    }
 //    
-//    func test_ReturnKeyAfterDefaultWithoutColon_DoesNotIndentNextLine() {
-//        textView.text = "\t\tdefault"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tdefault" +
-//                        "\n\t\t")     // Indentation level maintained
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
 //    
 //    func test_ReturnKeyAfterDefaultWithTextAfterColon_DoesNotIndentNextLine() {
 //        textView.text = "\t\tdefault: text"
