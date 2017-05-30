@@ -12,7 +12,7 @@ extension ViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         
-        let (newText, newRange) = textView.text.completedTextInput(for: text, in: range)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: text, in: textView.text, range: range)
         textView.text = newText
         textView.selectedRange = newRange
         
@@ -20,18 +20,18 @@ extension ViewController: UITextViewDelegate {
     }
 }
 
-extension String {
+struct FormattingHelper {
     // MARK: Internal Interface
-    func completedTextInput(for input: String, in range: NSRange) -> (newText: String, newRange: NSRange) {
+    static func completedTextInput(for input: String, in text: String, range: NSRange) -> (newText: String, newRange: NSRange) {
         
-        let selection = self.stringRange(from: range)
+        let selection = text.stringRange(from: range)
         
-        let previousCharacter = character(before: selection.lowerBound, ignoring: [" "])
-        let nextCharacter = character(at: selection.lowerBound, ignoring: [" "])
+        let previousCharacter = text.character(before: selection.lowerBound, ignoring: [" "])
+        let nextCharacter = text.character(at: selection.lowerBound, ignoring: [" "])
         
-        let line = rangeOfLine(around: selection.lowerBound)
-        let trimmedLine = substring(with: line).trimmingCharacters(in: .whitespaces)
-        let indentation = indentationLevel(of: line)
+        let line = text.rangeOfLine(around: selection.lowerBound)
+        let trimmedLine = text.substring(with: line).trimmingCharacters(in: .whitespaces)
+        let indentation = text.indentationLevel(of: line)
         
         var insertion = input
         var cursorOffset = insertion.characters.count
@@ -42,7 +42,7 @@ extension String {
                 if trimmedLine.hasPrefix("switch") {
                     if nextCharacter == "}" {
                         scenario = .newLineBetweenCurlyBracesAfterSwitch
-                    } else if number(of: "}") >= number(of: "{") {
+                    } else if text.number(of: "}") >= text.number(of: "{") {
                         scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
                     } else {
                         scenario = .newLineAfterCurlyBraceAfterSwitch
@@ -50,7 +50,7 @@ extension String {
                 } else {
                     if nextCharacter == "}" {
                         scenario = .newLineBetweenCurlyBraces
-                    } else if number(of: "}") >= number(of: "{") {
+                    } else if text.number(of: "}") >= text.number(of: "{") {
                         scenario = .newLineAfterCurlyBraceAlreadyClosed
                     } else {
                         scenario = .newLineAfterCurlyBrace
@@ -61,16 +61,17 @@ extension String {
             }
         }
         
-        (insertion, cursorOffset) = String.completedInput(for: input, scenario: scenario, indentation: indentation)
+        (insertion, cursorOffset) = completedInput(for: input, scenario: scenario, indentation: indentation)
         
-        let newText = self.replacingCharacters(in: selection, with: insertion)
+        let newText = text.replacingCharacters(in: selection, with: insertion)
         let newLocation = range.location + cursorOffset
         let newRange = NSMakeRange(newLocation, 0)
-
+        
         return (newText: newText, newRange: newRange)
     }
     
-    // MARK: Private Implementation (yet to be marked as private once this file is done, maybe put in a private String extension)
+    // MARK: Private Implementation
+    // TODO: Mark as private
     enum Scenario {
         case normal
         case newLine
@@ -81,7 +82,7 @@ extension String {
         case newLineBetweenCurlyBracesAfterSwitch
         case newLineAfterCurlyBraceAlreadyClosedAfterSwitch
     }
-
+    
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
         var insertion = ""
         var cursorOffset = 0
@@ -133,6 +134,20 @@ extension String {
         return (insertion, cursorOffset: cursorOffset)
     }
     
+    static func tabs(for indentation: Int) -> String {
+        var tabs = ""
+        if indentation > 0 {
+            for _ in 1...indentation {
+                tabs += "\t"
+            }
+        }
+        return tabs
+    }
+}
+
+// TODO: Mark as private
+extension String {
+
     func stringRange(from range: NSRange) -> Range<String.Index> {
         let start = self.index(self.startIndex, offsetBy: range.location)
         let end = self.index(start, offsetBy: range.length)
@@ -218,16 +233,6 @@ extension String {
     func number(of string: String) -> Int {
         let range = startIndex..<endIndex
         return number(of: string, in: range)
-    }
-    
-    static func tabs(for indentation: Int) -> String {
-        var tabs = ""
-        if indentation > 0 {
-            for _ in 1...indentation {
-                tabs += "\t"
-            }
-        }
-        return tabs
     }
 }
 

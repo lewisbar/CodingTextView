@@ -15,10 +15,10 @@ class FormattingHelperTests: XCTestCase {
     // MARK: Normal Text
     func test_NormalCharacter_InsertedNormally() {
         let text = "test"
-        let selection = NSMakeRange(3, 0) // "t"
+        let range = NSMakeRange(3, 0) // "t"
         
         let insertion = "a"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText = "tesat"
         let expectedRange = NSMakeRange(4, 0) // "t"
@@ -30,10 +30,10 @@ class FormattingHelperTests: XCTestCase {
     
     func test_NormalText_InsertedNormally() {
         let text = "test"
-        let selection = NSMakeRange(3, 0) // "t"
+        let range = NSMakeRange(3, 0) // "t"
 
         let insertion = "abc"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText = "tesabct"
         let expectedRange = NSMakeRange(6, 0) // "t"
@@ -45,10 +45,10 @@ class FormattingHelperTests: XCTestCase {
     
     func test_NormalText_ReplacesSelection() {
         let text = "test abc test"
-        let selection = NSMakeRange(4, 4) // " abc"
+        let range = NSMakeRange(4, 4) // " abc"
         
         let insertion = "er"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText = "tester test"
         let expectedRange = NSMakeRange(6, 0) // After "tester"
@@ -62,10 +62,10 @@ class FormattingHelperTests: XCTestCase {
     func test_NewLine_MaintainsIndentation() {
         let text =
             "\t\t" + "test"
-        let selection = NSMakeRange(6, 0) // End
+        let range = NSMakeRange(6, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test" + "\n" +
@@ -80,10 +80,10 @@ class FormattingHelperTests: XCTestCase {
     func test_NewLine_AfterCurlyBrace_IndentsAndAddsClosedBrace() {
         let text =
             "\t\t" + "test {"
-        let selection = NSMakeRange(8, 0) // End
+        let range = NSMakeRange(8, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
@@ -99,10 +99,10 @@ class FormattingHelperTests: XCTestCase {
     func test_newLine_BetweenCurlyBraces_UsesExistingBrace() {
         let text =
             "\t\t" + "test {}"
-        let selection = NSMakeRange(8, 0) // Closed brace
+        let range = NSMakeRange(8, 0) // Closed brace
         
         let insertion = "\n"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
@@ -119,10 +119,10 @@ class FormattingHelperTests: XCTestCase {
         let text =
             "\t\t" + "test {" + "\n" +
             "another line }"
-        let selection = NSMakeRange(8, 0) // After open curly brace
+        let range = NSMakeRange(8, 0) // After open curly brace
         
         let insertion = "\n"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
@@ -138,10 +138,10 @@ class FormattingHelperTests: XCTestCase {
     func test_newLine_AfterCurlyBraceAfterSwitch_AddsClosedBraceWithoutIndenting() {
         let text =
             "\t\t" + "switch test {"
-        let selection = NSMakeRange(15, 0) // End
+        let range = NSMakeRange(15, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "switch test {" + "\n" +
@@ -157,10 +157,10 @@ class FormattingHelperTests: XCTestCase {
     func test_NewLine_BetweenCurlyBracesAfterSwitch_UsesExistingCurlyBraceWithoutIndenting() {
         let text =
             "\t\t" + "switch test {}"
-        let selection = NSMakeRange(15, 0) // Closed brace
+        let range = NSMakeRange(15, 0) // Closed brace
         
         let insertion = "\n"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "switch test {" + "\n" +
@@ -177,10 +177,10 @@ class FormattingHelperTests: XCTestCase {
         let text =
             "\t\t" + "switch test {" + "\n" +
             "another line }"
-        let selection = NSMakeRange(15, 0) // After open curly brace
+        let range = NSMakeRange(15, 0) // After open curly brace
         
         let insertion = "\n"
-        let (newText, newRange) = text.completedTextInput(for: insertion, in: selection)
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "switch test {" + "\n" +
@@ -496,7 +496,7 @@ class FormattingHelperTests: XCTestCase {
     // Helper methods should be made private once they pass the test (or at least at some point in the future)
     // CompletedInput
     func test_CompletedInput_Normal() {
-        let (insertion, offset) = String.completedInput(for: "abc", scenario: .normal, indentation: 2)
+        let (insertion, offset) = FormattingHelper.completedInput(for: "abc", scenario: .normal, indentation: 2)
         let expectedInsertion = "abc"
         let expectedOffset = 3
         XCTAssertEqual(expectedInsertion, insertion)
@@ -504,7 +504,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_CompletedInput_NewLine() {
-        let (insertion, offset) = String.completedInput(for: "\n", scenario: .newLine, indentation: 2)
+        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLine, indentation: 2)
         let expectedInsertion = "\n\t\t"
         let expectedOffset = 3
         XCTAssertEqual(expectedInsertion, insertion)
@@ -512,7 +512,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_CompletedInput_NewLineAfterCurlyBrace() {
-        let (insertion, offset) = String.completedInput(for: "\n", scenario: .newLineAfterCurlyBrace, indentation: 2)
+        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLineAfterCurlyBrace, indentation: 2)
         let expectedInsertion = "\n\t\t\t\n\t\t}"
         let expectedOffset = 4
         XCTAssertEqual(expectedInsertion, insertion)
@@ -520,7 +520,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_CompletedInput_NewLineAfterCurlyBraceAlreadyClosed() {
-        let (insertion, offset) = String.completedInput(for: "\n", scenario: .newLineAfterCurlyBraceAlreadyClosed, indentation: 2)
+        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLineAfterCurlyBraceAlreadyClosed, indentation: 2)
         let expectedInsertion = "\n\t\t\t"
         let expectedOffset = 4
         XCTAssertEqual(expectedInsertion, insertion)
@@ -530,8 +530,8 @@ class FormattingHelperTests: XCTestCase {
     // Other Helpers
     func test_StringRangeFromRange() {
         let text = "0123456789"
-        let selection = NSMakeRange(1, 2)   // 1 and 2
-        let stringRange = text.stringRange(from: selection)
+        let range = NSMakeRange(1, 2)   // 1 and 2
+        let stringRange = text.stringRange(from: range)
         let selectedText = text.substring(with: stringRange)
         XCTAssertEqual(selectedText, "12")
     }
@@ -563,7 +563,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_Tabs() {
-        let tabs = String.tabs(for: 3)
+        let tabs = FormattingHelper.tabs(for: 3)
         XCTAssertEqual(tabs, "\t\t\t")
     }
     
