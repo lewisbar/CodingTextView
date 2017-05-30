@@ -223,6 +223,21 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterDefaultWithoutColon_BehavesNormally() {
+        let text = "\t\t" + "default"
+        let range = NSMakeRange(9, 0) // End
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "default" + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(12, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterColonAfterCase_Indents() {
         let text = "\t\t" + "case test:"
         let range = NSMakeRange(12, 0) // After colon
