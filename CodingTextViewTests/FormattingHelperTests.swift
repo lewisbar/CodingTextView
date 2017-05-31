@@ -193,6 +193,25 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterCurlyBraceAfterSwitchWithoutText_IgnoresSwitch() {
+        let text =
+            "\t\t" + "switch {"
+        let range = NSMakeRange(10, 0) // End
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch {" + "\n" +
+            "\t\t\t" + "\n" +
+            "\t\t" + "}"
+        let expectedRange = NSMakeRange(14, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterColon_NotIndented() {
         let text = "\t\t" + "test:"
         let range = NSMakeRange(7, 0) // After colon

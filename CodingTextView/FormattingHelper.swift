@@ -30,7 +30,7 @@ struct FormattingHelper {
         let nextCharacter = text.character(at: selection.lowerBound, ignoring: [" "])
         
         let lineRange = text.rangeOfLine(around: selection.lowerBound)
-        let trimmedLine = text.components(separatedBy: .whitespaces).joined()
+        let distilledLine = text.components(separatedBy: .whitespaces).joined()
         let indentation = text.indentationLevel(of: lineRange)
         
         var insertion = input
@@ -39,7 +39,7 @@ struct FormattingHelper {
         
         if input == "\n" {
             if previousCharacter == "{" {
-                if trimmedLine.hasPrefix("switch") {
+                if distilledLine.hasPrefix("switch"), distilledLine != "switch{" {
                     if nextCharacter == "}" {
                         scenario = .newLineBetweenCurlyBracesAfterSwitch
                     } else if text.number(of: "}") >= text.number(of: "{") {
@@ -57,7 +57,7 @@ struct FormattingHelper {
                     }
                 }
             } else if previousCharacter == ":",
-                ((trimmedLine.hasPrefix("case") && trimmedLine != "case:") || trimmedLine == "default:") {
+                ((distilledLine.hasPrefix("case") && distilledLine != "case:") || distilledLine == "default:") {
                 scenario = .newLineAfterColonAfterCaseOrDefault
             } else {
                 scenario = .newLine
