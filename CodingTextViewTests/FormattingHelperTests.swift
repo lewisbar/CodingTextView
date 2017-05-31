@@ -193,7 +193,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NewLine_AfterColon_BehavesNormally() {
+    func test_NewLine_AfterColon_NotIndented() {
         let text = "\t\t" + "test:"
         let range = NSMakeRange(7, 0) // After colon
         let insertion = "\n"
@@ -208,7 +208,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NewLine_AfterCaseWithoutColon_BehavesNormally() {
+    func test_NewLine_AfterCaseWithoutColon_NotIndented() {
         let text = "\t\t" + "case test"
         let range = NSMakeRange(11, 0) // End
         let insertion = "\n"
@@ -223,7 +223,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NewLine_AfterDefaultWithoutColon_BehavesNormally() {
+    func test_NewLine_AfterDefaultWithoutColon_NotIndented() {
         let text = "\t\t" + "default"
         let range = NSMakeRange(9, 0) // End
         let insertion = "\n"
@@ -268,21 +268,72 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterTextAfterColonAfterCase_NotIndented() {
+        let text = "\t\t" + "case test: test"
+        let range = NSMakeRange(17, 0) // End
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "case test: test" + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(20, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterTextAfterColonAfterDefault_NotIndented() {
+        let text = "\t\t" + "default: test"
+        let range = NSMakeRange(15, 0) // End
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "default: test" + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(18, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterColonAfterCaseWithoutText_NotIndented() {
+        let text = "\t\t" + "case:"
+        let range = NSMakeRange(7, 0) // After colon
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "case:" + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(10, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterColonAfterDefaultWithText_NotIndented() {
+        let text = "\t\t" + "default test:"
+        let range = NSMakeRange(15, 0) // End
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "default test:" + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(18, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     
 //
 //    // MARK: - Return Key After Curly Brace
 
 //    
-//    func test_ReturnKeyAfterCaseWithTextAfterColon_DoesNotIndentNextLine() {
-//        textView.text = "\t\tcase test: text"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\n")
-//        
-//        XCTAssertEqual(textView.text,
-//                        "\t\tcase test: text" +
-//                        "\n\t\t")     // Indentation level maintained
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
+
 //    
 //    // MARK: - Return Key After "default"
 //
@@ -297,7 +348,7 @@ class FormattingHelperTests: XCTestCase {
 //                        "\n\t\t\t")     // Indentation level raised
 //        XCTAssertEqual(cursorOffsetFromEnd, 0)
 //    }
-//    
+//
 //    
 //    func test_ReturnKeyAfterDefaultWithTextAfterColon_DoesNotIndentNextLine() {
 //        textView.text = "\t\tdefault: text"

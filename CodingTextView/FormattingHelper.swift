@@ -29,9 +29,9 @@ struct FormattingHelper {
         let previousCharacter = text.character(before: selection.lowerBound, ignoring: [" "])
         let nextCharacter = text.character(at: selection.lowerBound, ignoring: [" "])
         
-        let line = text.rangeOfLine(around: selection.lowerBound)
-        let trimmedLine = text.substring(with: line).trimmingCharacters(in: .whitespaces)
-        let indentation = text.indentationLevel(of: line)
+        let lineRange = text.rangeOfLine(around: selection.lowerBound)
+        let trimmedLine = text.components(separatedBy: .whitespaces).joined()
+        let indentation = text.indentationLevel(of: lineRange)
         
         var insertion = input
         var cursorOffset = insertion.characters.count
@@ -57,7 +57,7 @@ struct FormattingHelper {
                     }
                 }
             } else if previousCharacter == ":",
-                (trimmedLine.hasPrefix("case") || trimmedLine.hasPrefix("default")) {
+                ((trimmedLine.hasPrefix("case") && trimmedLine != "case:") || trimmedLine == "default:") {
                 scenario = .newLineAfterColonAfterCaseOrDefault
             } else {
                 scenario = .newLine
