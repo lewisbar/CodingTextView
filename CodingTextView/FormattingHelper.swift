@@ -12,7 +12,7 @@ extension ViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: text, in: textView.text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: text, in: textView.text, range: range)
         textView.text = newText
         textView.selectedRange = newRange
         
@@ -22,7 +22,7 @@ extension ViewController: UITextViewDelegate {
 
 struct FormattingHelper {
     // MARK: Internal Interface
-    static func completedTextInput(for input: String, in text: String, range: NSRange) -> (newText: String, newRange: NSRange) {
+    static func formattedText(for input: String, in text: String, range: NSRange) -> (newText: String, newRange: NSRange) {
         guard let selection = text.stringRange(from: range),
             let scenario = FormattingHelper.scenario(for: input, in: text, range: range) else { return (text, range) }
         

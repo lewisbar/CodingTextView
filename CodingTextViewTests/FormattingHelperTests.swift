@@ -11,14 +11,14 @@ import XCTest
 
 class FormattingHelperTests: XCTestCase {
     
-    // MARK: - completedTextInput(for:in:range:)
+    // MARK: - formattedText(for:in:range:)
     // MARK: Normal Text
     func test_NormalCharacter_InsertedNormally() {
         let text = "test"
         let range = NSMakeRange(3, 0) // "t"
         
         let insertion = "a"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText = "tesat"
         let expectedRange = NSMakeRange(4, 0) // "t"
@@ -33,7 +33,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(3, 0) // "t"
 
         let insertion = "abc"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText = "tesabct"
         let expectedRange = NSMakeRange(6, 0) // "t"
@@ -48,7 +48,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(4, 4) // " abc"
         
         let insertion = "er"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText = "tester test"
         let expectedRange = NSMakeRange(6, 0) // After "tester"
@@ -65,7 +65,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(6, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test" + "\n" +
@@ -83,7 +83,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(8, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
@@ -102,7 +102,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(8, 0) // Closed brace
         
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
@@ -122,7 +122,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(8, 0) // After open curly brace
         
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test {" + "\n" +
@@ -141,7 +141,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(15, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "switch test {" + "\n" +
@@ -160,7 +160,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(15, 0) // Closed brace
         
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "switch test {" + "\n" +
@@ -180,7 +180,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(15, 0) // After open curly brace
         
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "switch test {" + "\n" +
@@ -199,7 +199,7 @@ class FormattingHelperTests: XCTestCase {
         let range = NSMakeRange(10, 0) // End
         
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "switch {" + "\n" +
@@ -216,7 +216,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "test:"
         let range = NSMakeRange(7, 0) // After colon
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "test:" + "\n" +
@@ -231,7 +231,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "case test"
         let range = NSMakeRange(11, 0) // End
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "case test" + "\n" +
@@ -246,7 +246,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "default"
         let range = NSMakeRange(9, 0) // End
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "default" + "\n" +
@@ -261,7 +261,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "case test:"
         let range = NSMakeRange(12, 0) // After colon
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "case test:" + "\n" +
@@ -276,7 +276,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "default:"
         let range = NSMakeRange(10, 0) // After colon
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "default:" + "\n" +
@@ -291,7 +291,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "case test: test"
         let range = NSMakeRange(17, 0) // End
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "case test: test" + "\n" +
@@ -306,7 +306,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "default: test"
         let range = NSMakeRange(15, 0) // End
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "default: test" + "\n" +
@@ -321,7 +321,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "case:"
         let range = NSMakeRange(7, 0) // After colon
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "case:" + "\n" +
@@ -336,7 +336,7 @@ class FormattingHelperTests: XCTestCase {
         let text = "\t\t" + "default test:"
         let range = NSMakeRange(15, 0) // End
         let insertion = "\n"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "default test:" + "\n" +
@@ -355,7 +355,7 @@ class FormattingHelperTests: XCTestCase {
             "\t\t\t\t" + "case test"
         let range = NSMakeRange(29, 0) // End
         let insertion = ":"
-        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText =
             "\t\t" + "switch test {" + "\n" +
