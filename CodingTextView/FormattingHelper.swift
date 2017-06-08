@@ -23,18 +23,57 @@ extension ViewController: UITextViewDelegate {
 struct FormattingHelper {
     // MARK: Internal Interface
     static func completedTextInput(for input: String, in text: String, range: NSRange) -> (newText: String, newRange: NSRange) {
+        guard let selection = text.stringRange(from: range),
+            let scenario = FormattingHelper.scenario(for: input, in: text, range: range) else { return (text, range) }
         
-        guard let selection = text.stringRange(from: range) else { return (text, range) }
+        let line = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
+        let indentation = text.indentationLevel(of: line)
+        
+        var (insertion, cursorOffset) = completedInput(for: input, scenario: scenario, indentation: indentation)
+        
+        var newText = text.replacingCharacters(in: selection, with: insertion)
+        
+        // Change the indentation of the current line if needed
+        // TODO: Refactor indentation correction into its own method
+        if scenario == .colonAfterCaseOrDefault,
+            let switchIndentation = text.indentationLevelOfLast("switch", before: selection.lowerBound) {
+            let newCursor = newText.index(selection.lowerBound, offsetBy: cursorOffset)
+            let newLine = newText.lineRange(for: newCursor..<newCursor)
+            newText = newText.settingIndentationLevel(of: newLine, to: switchIndentation)
+            cursorOffset += (switchIndentation - indentation)
+        }
+        
+        let newLocation = range.location + cursorOffset
+        let newRange = NSMakeRange(newLocation, 0)
+        
+        return (newText: newText, newRange: newRange)
+    }
+    
+    // MARK: Private Implementation
+    // TODO: Mark as private
+    enum Scenario {
+        case normal
+        case newLine
+        case newLineAfterCurlyBrace
+        case newLineBetweenCurlyBraces
+        case newLineAfterCurlyBraceAlreadyClosed
+        case newLineAfterCurlyBraceAfterSwitch
+        case newLineBetweenCurlyBracesAfterSwitch
+        case newLineAfterCurlyBraceAlreadyClosedAfterSwitch
+        case newLineAfterColonAfterCaseOrDefault
+        case colonAfterCaseOrDefault
+    }
+    
+    static func scenario(for input: String, in text: String, range: NSRange) -> Scenario? {
+        guard let selection = text.stringRange(from: range) else { return nil }
         
         let previousCharacter = text.character(before: selection.lowerBound, ignoring: [" "])
         let nextCharacter = text.character(at: selection.lowerBound, ignoring: [" "])
         
-        let lineRange = text.rangeOfLine(around: selection.lowerBound)
-        let distilledLine = text.components(separatedBy: .whitespaces).joined()
-        let indentation = text.indentationLevel(of: lineRange)
+        let lineRange = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
+        let line = text.substring(with: lineRange)
+        let distilledLine = line.components(separatedBy: .whitespaces).joined()
         
-        var insertion = input
-        var cursorOffset = insertion.characters.count
         var scenario = Scenario.normal
         
         if input == "\n" {
@@ -62,94 +101,70 @@ struct FormattingHelper {
             } else {
                 scenario = .newLine
             }
+        } else if input == ":",
+            ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default") {
+            scenario = .colonAfterCaseOrDefault
         }
         
-        (insertion, cursorOffset) = completedInput(for: input, scenario: scenario, indentation: indentation)
-        
-        let newText = text.replacingCharacters(in: selection, with: insertion)
-        let newLocation = range.location + cursorOffset
-        let newRange = NSMakeRange(newLocation, 0)
-        
-        return (newText: newText, newRange: newRange)
-    }
-    
-    // MARK: Private Implementation
-    // TODO: Mark as private
-    enum Scenario {
-        case normal
-        case newLine
-        case newLineAfterCurlyBrace
-        case newLineBetweenCurlyBraces
-        case newLineAfterCurlyBraceAlreadyClosed
-        case newLineAfterCurlyBraceAfterSwitch
-        case newLineBetweenCurlyBracesAfterSwitch
-        case newLineAfterCurlyBraceAlreadyClosedAfterSwitch
-        case newLineAfterColonAfterCaseOrDefault
+        return scenario
     }
     
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
-        var insertion = ""
-        var cursorOffset = 0
+        var insertion = input
+        var cursorOffset = input.characters.count
         
         switch scenario {
         case .normal:
             insertion = input
             cursorOffset = insertion.characters.count
         case .newLine:
-            let completion = tabs(for: indentation)
+            let completion = String.tabs(for: indentation)
             insertion = input + completion
             cursorOffset = insertion.characters.count
         case .newLineAfterCurlyBrace:
-            var completion = tabs(for: indentation + 1)
+            var completion = String.tabs(for: indentation + 1)
             completion += "\n"
-            completion += tabs(for: indentation)
+            completion += String.tabs(for: indentation)
             completion += "}"
             insertion = input + completion
             cursorOffset = input.characters.count + indentation + 1
         case .newLineBetweenCurlyBraces:
-            var completion = tabs(for: indentation + 1)
+            var completion = String.tabs(for: indentation + 1)
             completion += "\n"
-            completion += tabs(for: indentation)
+            completion += String.tabs(for: indentation)
             insertion = input + completion
             cursorOffset = input.characters.count + indentation + 1
         case .newLineAfterCurlyBraceAlreadyClosed:
-            let completion = tabs(for: indentation + 1)
+            let completion = String.tabs(for: indentation + 1)
             insertion = input + completion
             cursorOffset = insertion.characters.count
         case .newLineAfterCurlyBraceAfterSwitch:
-            var completion = tabs(for: indentation)
+            var completion = String.tabs(for: indentation)
             completion += "\n"
-            completion += tabs(for: indentation)
+            completion += String.tabs(for: indentation)
             completion += "}"
             insertion = input + completion
             cursorOffset = input.characters.count + indentation
         case .newLineBetweenCurlyBracesAfterSwitch:
-            var completion = tabs(for: indentation)
+            var completion = String.tabs(for: indentation)
             completion += "\n"
-            completion += tabs(for: indentation)
+            completion += String.tabs(for: indentation)
             insertion = input + completion
             cursorOffset = input.characters.count + indentation
         case .newLineAfterCurlyBraceAlreadyClosedAfterSwitch:
-            let completion = tabs(for: indentation)
+            let completion = String.tabs(for: indentation)
             insertion = input + completion
             cursorOffset = insertion.characters.count
         case .newLineAfterColonAfterCaseOrDefault:
-            let completion = tabs(for: indentation + 1)
+            let completion = String.tabs(for: indentation + 1)
             insertion = input + completion
+            cursorOffset = insertion.characters.count
+        case .colonAfterCaseOrDefault:
+            insertion = input
             cursorOffset = insertion.characters.count
         }
         
         return (insertion, cursorOffset: cursorOffset)
-    }
-    
-    static func tabs(for indentation: Int) -> String {
-        var tabs = ""
-        if indentation > 0 {
-            for _ in 1...indentation {
-                tabs += "\t"
-            }
-        }
-        return tabs
     }
 }
 
@@ -191,13 +206,6 @@ extension String {
         }
     }
     
-    func rangeOfLine(around position: String.Index) -> Range<String.Index> {
-        let startOfLine = range(ofClosest: "\n", before: position)?.upperBound ?? startIndex
-        let endOfLine = range(ofClosest: "\n", after: position)?.lowerBound ?? endIndex
-        
-        return startOfLine..<endOfLine
-    }
-    
     func indentationLevel(of line: Range<String.Index>) -> Int {
         var level = 0
         var position = line.lowerBound
@@ -208,6 +216,27 @@ extension String {
             position = index(after: position)
         }
         return level
+    }
+    
+    func indentationLevelOfLast(_ phrase: String, before position: String.Index) -> Int? {
+        guard let switchRange = range(ofClosest: "switch", before: position) else { return nil }
+        let switchLine = lineRange(for: switchRange)
+        return indentationLevel(of: switchLine)
+    }
+    
+    func removingIndentation(of line: Range<String.Index>) -> String {
+        var newText = self
+        let indentation = indentationLevel(of: line)
+        let endOfTabs = index(line.lowerBound, offsetBy: indentation)
+        newText.removeSubrange(line.lowerBound..<endOfTabs)
+        return newText
+    }
+    
+    func settingIndentationLevel(of line: Range<String.Index>, to level: Int) -> String {
+        var newText = self.removingIndentation(of: line)
+        let tabs = String.tabs(for: level)
+        newText.insert(contentsOf: tabs.characters, at: line.lowerBound)
+        return newText
     }
     
     func character(at position: String.Index, ignoring: [Character] = []) -> Character? {
@@ -242,6 +271,16 @@ extension String {
     func number(of string: String) -> Int {
         let range = startIndex..<endIndex
         return number(of: string, in: range)
+    }
+    
+    static func tabs(for indentation: Int) -> String {
+        var tabs = ""
+        if indentation > 0 {
+            for _ in 1...indentation {
+                tabs += "\t"
+            }
+        }
+        return tabs
     }
 }
 

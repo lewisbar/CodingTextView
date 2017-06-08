@@ -417,6 +417,7 @@
 				3043D7E61EC7A03100ACB1E2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B92F02A81EAE809D007875B1 /* Build configuration list for PBXProject "CodingTextView" */ = {
 			isa = XCConfigurationList;

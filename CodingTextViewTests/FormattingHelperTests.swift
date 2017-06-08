@@ -348,6 +348,23 @@ class FormattingHelperTests: XCTestCase {
     }
     
     
+    // MARK: - Colon
+    func test_ColonAfterCase_AdoptsSwitchIndentation() {
+        let text =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t\t\t" + "case test"
+        let range = NSMakeRange(29, 0) // End
+        let insertion = ":"
+        let (newText, newRange) = FormattingHelper.completedTextInput(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t" + "case test:"
+        let expectedRange = NSMakeRange(28, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 //
 //    // MARK: - Return Key After Curly Brace
 
@@ -659,7 +676,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_Tabs() {
-        let tabs = FormattingHelper.tabs(for: 3)
+        let tabs = String.tabs(for: 3)
         XCTAssertEqual(tabs, "\t\t\t")
     }
     
@@ -692,11 +709,50 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertNil(character)
     }
     
-    func test_numberOfStringInRange() {
+    func test_NumberOfStringInRange() {
         let text = "ab..cdef..ghi..jkl..mnop...qrs."
         let range = text.startIndex..<text.endIndex
         let number = text.number(of: "..", in: range)
         let expectedNumber = 5
         XCTAssertEqual(expectedNumber, number)
+    }
+    
+    func test_RemovingIndentation() {
+        let text =
+            "\t" + "line 1" + "\n" +
+            "\t\t\t" + "line 2"
+        let line2Start = text.index(text.startIndex, offsetBy: 8)
+        let line2Range = line2Start..<text.endIndex
+        let newText = text.removingIndentation(of: line2Range)
+        let expectedText =
+            "\t" + "line 1" + "\n" +
+            "line 2"
+        XCTAssertEqual(newText, expectedText)
+    }
+    
+    func test_SettingIndentationLevel_CanIncreaseIndentation() {
+        let text =
+            "\t" + "line 1" + "\n" +
+            "\t" + "line 2"
+        let line2Start = text.index(text.startIndex, offsetBy: 8)
+        let line2Range = line2Start..<text.endIndex
+        let newText = text.settingIndentationLevel(of: line2Range, to: 3)
+        let expectedText =
+            "\t" + "line 1" + "\n" +
+            "\t\t\t" + "line 2"
+        XCTAssertEqual(newText, expectedText)
+    }
+    
+    func test_SettingIndentationLevel_CanDecreaseIndentation() {
+        let text =
+            "\t" + "line 1" + "\n" +
+            "\t\t\t" + "line 2"
+        let line2Start = text.index(text.startIndex, offsetBy: 8)
+        let line2Range = line2Start..<text.endIndex
+        let newText = text.settingIndentationLevel(of: line2Range, to: 1)
+        let expectedText =
+            "\t" + "line 1" + "\n" +
+            "\t" + "line 2"
+        XCTAssertEqual(newText, expectedText)
     }
 }
