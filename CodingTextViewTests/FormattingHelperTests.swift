@@ -633,6 +633,7 @@ class FormattingHelperTests: XCTestCase {
     
     // MARK: - Helper Tests
     // Helper methods should be made private once they pass the test (or at least at some point in the future)
+    // These tests must then be deleted or commented out
     // CompletedInput
     func test_CompletedInput_Normal() {
         let (insertion, offset) = FormattingHelper.completedInput(for: "abc", scenario: .normal, indentation: 2)
