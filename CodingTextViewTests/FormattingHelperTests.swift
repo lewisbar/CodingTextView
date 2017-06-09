@@ -58,6 +58,33 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    // MARK: Backspace
+    func test_Backspace_DeletesPreviousCharacter() {
+        let text = "test abc"
+        let range = NSMakeRange(5, 1)   // Cursor after "a", so the range contains the "a"
+        let insertion = ""
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "test bc"
+        let expectedRange = NSMakeRange(5, 0)   // Before "b"
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_BackspaceWhileTextIsSelected_DeletesSelectedText() {
+        let text = "test abc"
+        let range = NSMakeRange(5, 2)   // "ab"
+        let insertion = ""
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "test c"
+        let expectedRange = NSMakeRange(5, 0)   // Before "c"
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     // MARK: New Line
     func test_NewLine_MaintainsIndentation() {
         let text =
@@ -365,7 +392,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
-//
+
 //    // MARK: - Return Key After Curly Brace
 
 //    
