@@ -376,6 +376,36 @@ class FormattingHelperTests: XCTestCase {
     
     
     // MARK: - Colon
+    func test_ColonWithoutCaseOrDefault_BehavesNormally() {
+        let text = "\t\ttext"
+        let range = NSMakeRange(6, 0) // End
+        let insertion = ":"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "\t\ttext:"
+        let expectedRange = NSMakeRange(7, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ColonWithoutCaseOrDefault_WithSwitch_BehavesNormally() {
+        let text =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t\t\t" + "test"
+        let range = NSMakeRange(24, 0) // End
+        let insertion = ":"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t\t\t" + "test:"
+        let expectedRange = NSMakeRange(25, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_ColonAfterCase_AdoptsSwitchIndentation() {
         let text =
             "\t\t" + "switch test {" + "\n" +
@@ -392,6 +422,58 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+    
+    func test_ColonAfterDefault_AdoptsSwitchIndentation() {
+        let text =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t\t\t" + "default"
+        let range = NSMakeRange(27, 0) // End
+        let insertion = ":"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t" + "default:"
+        let expectedRange = NSMakeRange(26, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ColonAfterCaseWithoutSwitch_BehavesNormally() {
+        let text =
+            "\t\t" + "test {" + "\n" +
+            "\t\t\t\t" + "case test"
+        let range = NSMakeRange(22, 0) // End
+        let insertion = ":"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test {" + "\n" +
+            "\t\t\t\t" + "case test:"
+        let expectedRange = NSMakeRange(23, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ColonAfterDefaultWithoutSwitch_BehavesNormally() {
+        let text =
+            "\t\t" + "test {" + "\n" +
+            "\t\t\t\t" + "default"
+        let range = NSMakeRange(20, 0) // End
+        let insertion = ":"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test {" + "\n" +
+            "\t\t\t\t" + "default:"
+        let expectedRange = NSMakeRange(21, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+
 
 //    // MARK: - Return Key After Curly Brace
 
