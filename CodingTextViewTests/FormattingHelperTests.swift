@@ -375,7 +375,6 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    
     // MARK: - Colon
     func test_ColonWithoutCaseOrDefault_BehavesNormally() {
         let text = "\t\ttext"
@@ -474,9 +473,23 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
-
-//    
-//    // MARK: - Open Brackets
+    
+    // MARK: - Open Brackets
+    func test_openRoundBracket_ProducesClosedBracket() {
+        let text = "test"
+        let range = NSMakeRange(4, 0)   // End
+        let insertion = "("
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "test()" // Bracket closed
+        let expectedRange = NSMakeRange(5, 0) // Between the brackets
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+//
+//
 //    func test_openRoundBracket_ProducesClosedBracket() {
 //        textView.text = "test"
 //        cursorOffsetFromEnd = 0

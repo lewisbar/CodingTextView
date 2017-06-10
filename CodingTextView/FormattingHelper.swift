@@ -62,6 +62,7 @@ struct FormattingHelper {
         case newLineAfterCurlyBraceAlreadyClosedAfterSwitch
         case newLineAfterColonAfterCaseOrDefault
         case colonAfterCaseOrDefault
+        case openRoundBracket
     }
     
     static func scenario(for input: String, in text: String, range: NSRange) -> Scenario? {
@@ -104,6 +105,8 @@ struct FormattingHelper {
         } else if input == ":",
             ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default") {
             scenario = .colonAfterCaseOrDefault
+        } else if input == "(" {
+            scenario = .openRoundBracket
         }
         
         return scenario
@@ -162,6 +165,9 @@ struct FormattingHelper {
         case .colonAfterCaseOrDefault:
             insertion = input
             cursorOffset = insertion.characters.count
+        case .openRoundBracket:
+            insertion = input + ")"
+            cursorOffset = input.characters.count
         }
         
         return (insertion, cursorOffset: cursorOffset)
