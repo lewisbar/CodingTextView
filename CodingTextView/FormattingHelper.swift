@@ -63,6 +63,7 @@ struct FormattingHelper {
         case newLineAfterColonAfterCaseOrDefault
         case colonAfterCaseOrDefault
         case openRoundBracket
+        case openSquareBracket
     }
     
     static func scenario(for input: String, in text: String, range: NSRange) -> Scenario? {
@@ -107,6 +108,8 @@ struct FormattingHelper {
             scenario = .colonAfterCaseOrDefault
         } else if input == "(" {
             scenario = .openRoundBracket
+        } else if input == "[" {
+            scenario = .openSquareBracket
         }
         
         return scenario
@@ -167,6 +170,9 @@ struct FormattingHelper {
             cursorOffset = insertion.characters.count
         case .openRoundBracket:
             insertion = input + ")"
+            cursorOffset = input.characters.count
+        case .openSquareBracket:
+            insertion = input + "]"
             cursorOffset = input.characters.count
         }
         
