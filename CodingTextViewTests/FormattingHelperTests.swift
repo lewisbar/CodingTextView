@@ -11,6 +11,7 @@ import XCTest
 
 class FormattingHelperTests: XCTestCase {
     
+    // TODO: Probably all tests need a version with whitespace, meaning they should still work if a space or - in some cases - tab is in between the relevant parts of the string
     // MARK: - formattedText(for:in:range:)
     // MARK: Normal Text
     func test_NormalCharacter_InsertedNormally() {
