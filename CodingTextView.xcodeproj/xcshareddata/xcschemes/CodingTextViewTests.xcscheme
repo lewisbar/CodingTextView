@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0830"
+   LastUpgradeVersion = "0900"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -42,9 +42,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B92F02AC1EAE809D007875B1"
-            BuildableName = "CodingTextView.app"
-            BlueprintName = "CodingTextView"
+            BlueprintIdentifier = "3043D7DC1EC7A03100ACB1E2"
+            BuildableName = "CodingTextViewTests.xctest"
+            BlueprintName = "CodingTextViewTests"
             ReferencedContainer = "container:CodingTextView.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
