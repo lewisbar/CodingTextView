@@ -549,7 +549,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     // MARK: - Open Brackets
-    func test_openRoundBracket_ProducesClosedBracket() {
+    func test_OpenRoundBracket_ProducesClosedBracket() {
         let text = "test"
         let range = NSMakeRange(4, 0)   // End
         let insertion = "("
@@ -562,7 +562,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_openSquareBracket_ProducesClosedBracket() {
+    func test_OpenSquareBracket_ProducesClosedBracket() {
         let text = "test"
         let range = NSMakeRange(4, 0)   // End
         let insertion = "["
@@ -574,25 +574,24 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
-//
-//
-//    func test_openRoundBracket_ProducesClosedBracket() {
-//        textView.text = "test"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("(")
-//        
-//        XCTAssertEqual(textView.text, "test()") // Bracket closed
-//        XCTAssertEqual(cursorOffsetFromEnd, -1) // Between the brackets
-//    }
-//    
-//    func test_openSquareBracket_ProducesClosedBracket() {
-//        textView.text = "test"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("[")
-//        
-//        XCTAssertEqual(textView.text, "test[]") // Bracket closed
-//        XCTAssertEqual(cursorOffsetFromEnd, -1) // Between the brackets
-//    }
+    
+    func test_OpenRoundBracket_DoesNotProduceClosedBracket_IfTooManyClosedBrackets() {
+        let text = "test brackets)"
+        let range = NSMakeRange(5, 0)   // Before "brackets"
+        let insertion = "("
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "test (brackets)" // No additional bracket
+        let expectedRange = NSMakeRange(6, 0) // After the new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_OpenSquareBracket_DoesNotProduceClosedBracket_IfTooManyClosedBrackets() {
+        
+    }
+
 //    
 //    func test_openRoundBracket_DoesNotProduceClosedBracket_IfTooManyClosedBrackets() {
 //        textView.text = "bracket test)"
