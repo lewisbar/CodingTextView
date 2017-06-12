@@ -74,7 +74,7 @@ struct FormattingHelper {
         
         let lineRange = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
         let line = text.substring(with: lineRange)
-        let distilledLine = line.components(separatedBy: .whitespaces).joined()
+        let distilledLine = line.components(separatedBy: .whitespacesAndNewlines).joined()
         
         var scenario = Scenario.normal
         
