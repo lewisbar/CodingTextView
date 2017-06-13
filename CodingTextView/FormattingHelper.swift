@@ -75,39 +75,56 @@ struct FormattingHelper {
         let lineRange = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
         let line = text.substring(with: lineRange)
         let distilledLine = line.components(separatedBy: .whitespacesAndNewlines).joined()
+        let isSwitchLine: Bool = { return distilledLine.hasPrefix("switch") && distilledLine != "switch{" }()
         
         var scenario = Scenario.normal
         
         switch input {
-        case "\n"
-            where previousCharacter == "{" && distilledLine.hasPrefix("switch") && distilledLine != "switch{":
-            if nextCharacter == "}" {
+        case "\n" where previousCharacter == "{" && nextCharacter == "}":
+            if distilledLine.hasPrefix("switch"), distilledLine != "switch{" {
                 scenario = .newLineBetweenCurlyBracesAfterSwitch
-            } else if text.number(of: "}") >= text.number(of: "{") {
+            } else {
+                scenario = .newLineBetweenCurlyBraces
+            }
+        case "\n" where previousCharacter == "{" && text.number(of: "}") >= text.number(of: "{"):
+            if distilledLine.hasPrefix("switch"), distilledLine != "switch{" {
                 scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
             } else {
-                scenario = .newLineAfterCurlyBraceAfterSwitch
-            }
-        case "\n"
-            where previousCharacter == "{":
-            if nextCharacter == "}" {
-                scenario = .newLineBetweenCurlyBraces
-            } else if text.number(of: "}") >= text.number(of: "{") {
                 scenario = .newLineAfterCurlyBraceAlreadyClosed
+            }
+        case "\n" where previousCharacter == "{":
+            if distilledLine.hasPrefix("switch"), distilledLine != "switch{" {
+                scenario = .newLineAfterCurlyBraceAfterSwitch
             } else {
                 scenario = .newLineAfterCurlyBrace
             }
-        case "\n"
-            where (previousCharacter == ":") &&
+            
+//        case "\n" where previousCharacter == "{" &&
+//            distilledLine.hasPrefix("switch") &&
+//            distilledLine != "switch{":
+//            if nextCharacter == "}" {
+//                scenario = .newLineBetweenCurlyBracesAfterSwitch
+//            } else if text.number(of: "}") >= text.number(of: "{") {
+//                scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
+//            } else {
+//                scenario = .newLineAfterCurlyBraceAfterSwitch
+//            }
+//        case "\n" where previousCharacter == "{":
+//            if nextCharacter == "}" {
+//                scenario = .newLineBetweenCurlyBraces
+//            } else if text.number(of: "}") >= text.number(of: "{") {
+//                scenario = .newLineAfterCurlyBraceAlreadyClosed
+//            } else {
+//                scenario = .newLineAfterCurlyBrace
+//            }
+        case "\n" where (previousCharacter == ":") &&
             ((distilledLine.hasPrefix("case") && distilledLine != "case:") || distilledLine == "default:"):
             scenario = .newLineAfterColonAfterCaseOrDefault
         case "\n":
             scenario = .newLine
-        case ":"
-            where ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default"):
+        case ":" where ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default"):
             scenario = .colonAfterCaseOrDefault
-        case "("
-            where text.number(of: ")") <= text.number(of: "("):
+        case "(" where text.number(of: ")") <= text.number(of: "("):
             scenario = .openRoundBracket
         case "[":
             scenario = .openSquareBracket
