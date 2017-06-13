@@ -81,42 +81,23 @@ struct FormattingHelper {
         
         switch input {
         case "\n" where previousCharacter == "{" && nextCharacter == "}":
-            if distilledLine.hasPrefix("switch"), distilledLine != "switch{" {
+            if isSwitchLine {
                 scenario = .newLineBetweenCurlyBracesAfterSwitch
             } else {
                 scenario = .newLineBetweenCurlyBraces
             }
         case "\n" where previousCharacter == "{" && text.number(of: "}") >= text.number(of: "{"):
-            if distilledLine.hasPrefix("switch"), distilledLine != "switch{" {
+            if isSwitchLine {
                 scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
             } else {
                 scenario = .newLineAfterCurlyBraceAlreadyClosed
             }
         case "\n" where previousCharacter == "{":
-            if distilledLine.hasPrefix("switch"), distilledLine != "switch{" {
+            if isSwitchLine {
                 scenario = .newLineAfterCurlyBraceAfterSwitch
             } else {
                 scenario = .newLineAfterCurlyBrace
             }
-            
-//        case "\n" where previousCharacter == "{" &&
-//            distilledLine.hasPrefix("switch") &&
-//            distilledLine != "switch{":
-//            if nextCharacter == "}" {
-//                scenario = .newLineBetweenCurlyBracesAfterSwitch
-//            } else if text.number(of: "}") >= text.number(of: "{") {
-//                scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
-//            } else {
-//                scenario = .newLineAfterCurlyBraceAfterSwitch
-//            }
-//        case "\n" where previousCharacter == "{":
-//            if nextCharacter == "}" {
-//                scenario = .newLineBetweenCurlyBraces
-//            } else if text.number(of: "}") >= text.number(of: "{") {
-//                scenario = .newLineAfterCurlyBraceAlreadyClosed
-//            } else {
-//                scenario = .newLineAfterCurlyBrace
-//            }
         case "\n" where (previousCharacter == ":") &&
             ((distilledLine.hasPrefix("case") && distilledLine != "case:") || distilledLine == "default:"):
             scenario = .newLineAfterColonAfterCaseOrDefault
