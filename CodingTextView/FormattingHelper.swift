@@ -106,7 +106,8 @@ struct FormattingHelper {
         } else if input == ":",
             ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default") {
             scenario = .colonAfterCaseOrDefault
-        } else if input == "(" {
+        } else if input == "(",
+            text.number(of: ")") <= text.number(of: "(") {
             scenario = .openRoundBracket
         } else if input == "[" {
             scenario = .openSquareBracket
