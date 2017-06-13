@@ -589,7 +589,16 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_OpenSquareBracket_DoesNotProduceClosedBracket_IfTooManyClosedBrackets() {
+        let text = "test brackets]"
+        let range = NSMakeRange(5, 0)   // Before "brackets"
+        let insertion = "["
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
+        let expectedText = "test [brackets]" // No additional bracket
+        let expectedRange = NSMakeRange(6, 0) // After the new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
     }
 
 //    

@@ -107,7 +107,7 @@ struct FormattingHelper {
             scenario = .colonAfterCaseOrDefault
         case "(" where text.number(of: ")") <= text.number(of: "("):
             scenario = .openRoundBracket
-        case "[":
+        case "[" where text.number(of: "]") <= text.number(of: "["):
             scenario = .openSquareBracket
         default:
             break
