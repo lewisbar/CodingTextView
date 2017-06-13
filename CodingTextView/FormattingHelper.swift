@@ -78,39 +78,41 @@ struct FormattingHelper {
         
         var scenario = Scenario.normal
         
-        if input == "\n" {
-            if previousCharacter == "{" {
-                if distilledLine.hasPrefix("switch"), distilledLine != "switch{" {
-                    if nextCharacter == "}" {
-                        scenario = .newLineBetweenCurlyBracesAfterSwitch
-                    } else if text.number(of: "}") >= text.number(of: "{") {
-                        scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
-                    } else {
-                        scenario = .newLineAfterCurlyBraceAfterSwitch
-                    }
-                } else {
-                    if nextCharacter == "}" {
-                        scenario = .newLineBetweenCurlyBraces
-                    } else if text.number(of: "}") >= text.number(of: "{") {
-                        scenario = .newLineAfterCurlyBraceAlreadyClosed
-                    } else {
-                        scenario = .newLineAfterCurlyBrace
-                    }
-                }
-            } else if previousCharacter == ":",
-                ((distilledLine.hasPrefix("case") && distilledLine != "case:") || distilledLine == "default:") {
-                scenario = .newLineAfterColonAfterCaseOrDefault
+        switch input {
+        case "\n"
+            where previousCharacter == "{" && distilledLine.hasPrefix("switch") && distilledLine != "switch{":
+            if nextCharacter == "}" {
+                scenario = .newLineBetweenCurlyBracesAfterSwitch
+            } else if text.number(of: "}") >= text.number(of: "{") {
+                scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
             } else {
-                scenario = .newLine
+                scenario = .newLineAfterCurlyBraceAfterSwitch
             }
-        } else if input == ":",
-            ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default") {
+        case "\n"
+            where previousCharacter == "{":
+            if nextCharacter == "}" {
+                scenario = .newLineBetweenCurlyBraces
+            } else if text.number(of: "}") >= text.number(of: "{") {
+                scenario = .newLineAfterCurlyBraceAlreadyClosed
+            } else {
+                scenario = .newLineAfterCurlyBrace
+            }
+        case "\n"
+            where (previousCharacter == ":") &&
+            ((distilledLine.hasPrefix("case") && distilledLine != "case:") || distilledLine == "default:"):
+            scenario = .newLineAfterColonAfterCaseOrDefault
+        case "\n":
+            scenario = .newLine
+        case ":"
+            where ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default"):
             scenario = .colonAfterCaseOrDefault
-        } else if input == "(",
-            text.number(of: ")") <= text.number(of: "(") {
+        case "("
+            where text.number(of: ")") <= text.number(of: "("):
             scenario = .openRoundBracket
-        } else if input == "[" {
+        case "[":
             scenario = .openSquareBracket
+        default:
+            break
         }
         
         return scenario
