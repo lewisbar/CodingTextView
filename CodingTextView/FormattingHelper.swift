@@ -48,9 +48,11 @@ struct FormattingHelper {
         
         return (newText: newText, newRange: newRange)
     }
-    
-    // MARK: Private Implementation
-    // TODO: Mark as private
+}
+
+// MARK: Private Implementation
+// TODO: Mark as private
+extension FormattingHelper {
     enum Scenario {
         case normal
         case newLine
