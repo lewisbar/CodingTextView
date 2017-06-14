@@ -175,11 +175,11 @@ extension FormattingHelper {
             scenario = .newLine
         case ":" where ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default"):
             scenario = .colonAfterCaseOrDefault
-        case "(" where text.number(of: ")") <= text.number(of: "("):
+        case "(" where text.number(of: "(") >= text.number(of: ")"):
             scenario = .openRoundBracket
-        case "[" where text.number(of: "]") <= text.number(of: "["):
+        case "[" where text.number(of: "[") >= text.number(of: "]"):
             scenario = .openSquareBracket
-        case ")" where nextCharacter == ")":
+        case ")" where nextCharacter == ")" && (text.number(of: "(") <= text.number(of: ")")):
             scenario = .closedRoundBracketBeforeClosedBracket
         default:
             break

@@ -628,7 +628,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
 
-    func test_ClosedRoundBracketBeforeClosedRoundBracket_BehavesNormally_IfTooManyOpenBrackets() {
+    func test_ClosedRoundBracketBeforeClosedRoundBracket_BehavesNormally_IfMoreOpenBrackets() {
         let text = "(bracket (test)"
         let range = NSMakeRange(14, 0)   // Before closed bracket
         let insertion = ")"
