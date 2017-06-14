@@ -640,16 +640,8 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
-//
-//    func test_closedRoundBracketBeforeClosedRoundBracket_TreatedNormally_IfTooManyOpenBrackets() {
-//        textView.text = "(bracket (test)"
-//        cursorOffsetFromEnd = -1
-//        textView.insertAsCode(")")
-//        
-//        XCTAssertEqual(textView.text, "(bracket (test))") // Normal behavior
-//        XCTAssertEqual(cursorOffsetFromEnd, -1)
-//    }
-//    
+
+        
 //    // TODO: Play warning sound when too many closed round brackets in the document
 //    
 //    // MARK: - Closed Square Brackets
