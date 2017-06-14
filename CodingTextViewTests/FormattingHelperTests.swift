@@ -601,25 +601,33 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
 
-//    
-//    func test_openRoundBracket_DoesNotProduceClosedBracket_IfTooManyClosedBrackets() {
-//        textView.text = "bracket test)"
-//        cursorOffsetFromEnd = -5    // Before "test"
-//        textView.insertAsCode("(")
-//        
-//        XCTAssertEqual(textView.text, "bracket (test)") // No additional bracket
-//        XCTAssertEqual(cursorOffsetFromEnd, -5) // After the open bracket
-//    }
-//    
-//    func test_openSquareBracket_DoesNotProduceClosedBracket_IfTooManyClosedBrackets() {
-//        textView.text = "bracket test]"
-//        cursorOffsetFromEnd = -5    // Before "test"
-//        textView.insertAsCode("[")
-//        
-//        XCTAssertEqual(textView.text, "bracket [test]") // No additional bracket
-//        XCTAssertEqual(cursorOffsetFromEnd, -5) // After the open bracket
-//    }
-//    
+    // MARK: - Closed Round Brackets
+    func test_ClosedRoundBracketAfterNormalCharacter_BehavesNormally() {
+        let text = "(test"
+        let range = NSMakeRange(5, 0)   // End
+        let insertion = ")"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "(test)"
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedRoundBracketBeforeClosedRoundBracket_StepsOver() {
+        let text = "(test)"
+        let range = NSMakeRange(5, 0)   // Before closed bracket
+        let insertion = ")"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "(test)" // No bracket added
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+//
 //    // MARK: - Closed Round Brackets
 //    func test_closedRoundBracketAfterNormalCharacter_TreatedNormally() {
 //        textView.text = "bracket (test"

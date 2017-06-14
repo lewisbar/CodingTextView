@@ -66,56 +66,7 @@ extension FormattingHelper {
         case colonAfterCaseOrDefault
         case openRoundBracket
         case openSquareBracket
-    }
-    
-    static func scenario(for input: String, in text: String, range: NSRange) -> Scenario? {
-        guard let selection = text.stringRange(from: range) else { return nil }
-        
-        let previousCharacter = text.character(before: selection.lowerBound, ignoring: [" "])
-        let nextCharacter = text.character(at: selection.lowerBound, ignoring: [" "])
-        
-        let lineRange = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
-        let line = text.substring(with: lineRange)
-        let distilledLine = line.components(separatedBy: .whitespacesAndNewlines).joined()
-        let isValidSwitchLine: Bool = { return distilledLine.hasPrefix("switch") && distilledLine != "switch{" }()
-        
-        var scenario = Scenario.normal
-        
-        switch input {
-        case "\n" where previousCharacter == "{" && nextCharacter == "}":
-            if isValidSwitchLine {
-                scenario = .newLineBetweenCurlyBracesAfterSwitch
-            } else {
-                scenario = .newLineBetweenCurlyBraces
-            }
-        case "\n" where previousCharacter == "{" && text.number(of: "}") >= text.number(of: "{"):
-            if isValidSwitchLine {
-                scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
-            } else {
-                scenario = .newLineAfterCurlyBraceAlreadyClosed
-            }
-        case "\n" where previousCharacter == "{":
-            if isValidSwitchLine {
-                scenario = .newLineAfterCurlyBraceAfterSwitch
-            } else {
-                scenario = .newLineAfterCurlyBrace
-            }
-        case "\n" where (previousCharacter == ":") &&
-            ((distilledLine.hasPrefix("case") && distilledLine != "case:") || distilledLine == "default:"):
-            scenario = .newLineAfterColonAfterCaseOrDefault
-        case "\n":
-            scenario = .newLine
-        case ":" where ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default"):
-            scenario = .colonAfterCaseOrDefault
-        case "(" where text.number(of: ")") <= text.number(of: "("):
-            scenario = .openRoundBracket
-        case "[" where text.number(of: "]") <= text.number(of: "["):
-            scenario = .openSquareBracket
-        default:
-            break
-        }
-        
-        return scenario
+        case closedRoundBracketBeforeClosedBracket
     }
     
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
@@ -177,9 +128,64 @@ extension FormattingHelper {
         case .openSquareBracket:
             insertion = input + "]"
             cursorOffset = input.characters.count
+        case .closedRoundBracketBeforeClosedBracket:
+            insertion = ""
+            cursorOffset = input.characters.count
         }
         
         return (insertion, cursorOffset: cursorOffset)
+    }
+    
+    static func scenario(for input: String, in text: String, range: NSRange) -> Scenario? {
+        guard let selection = text.stringRange(from: range) else { return nil }
+        
+        let previousCharacter = text.character(before: selection.lowerBound, ignoring: [" "])
+        let nextCharacter = text.character(at: selection.lowerBound, ignoring: [" "])
+        
+        let lineRange = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
+        let line = text.substring(with: lineRange)
+        let distilledLine = line.components(separatedBy: .whitespacesAndNewlines).joined()
+        let isValidSwitchLine: Bool = { return distilledLine.hasPrefix("switch") && distilledLine != "switch{" }()
+        
+        var scenario = Scenario.normal
+        
+        switch input {
+        case "\n" where previousCharacter == "{" && nextCharacter == "}":
+            if isValidSwitchLine {
+                scenario = .newLineBetweenCurlyBracesAfterSwitch
+            } else {
+                scenario = .newLineBetweenCurlyBraces
+            }
+        case "\n" where previousCharacter == "{" && text.number(of: "}") >= text.number(of: "{"):
+            if isValidSwitchLine {
+                scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
+            } else {
+                scenario = .newLineAfterCurlyBraceAlreadyClosed
+            }
+        case "\n" where previousCharacter == "{":
+            if isValidSwitchLine {
+                scenario = .newLineAfterCurlyBraceAfterSwitch
+            } else {
+                scenario = .newLineAfterCurlyBrace
+            }
+        case "\n" where (previousCharacter == ":") &&
+            ((distilledLine.hasPrefix("case") && distilledLine != "case:") || distilledLine == "default:"):
+            scenario = .newLineAfterColonAfterCaseOrDefault
+        case "\n":
+            scenario = .newLine
+        case ":" where ((distilledLine.hasPrefix("case") && distilledLine != "case") || distilledLine == "default"):
+            scenario = .colonAfterCaseOrDefault
+        case "(" where text.number(of: ")") <= text.number(of: "("):
+            scenario = .openRoundBracket
+        case "[" where text.number(of: "]") <= text.number(of: "["):
+            scenario = .openSquareBracket
+        case ")" where nextCharacter == ")":
+            scenario = .closedRoundBracketBeforeClosedBracket
+        default:
+            break
+        }
+        
+        return scenario
     }
 }
 
