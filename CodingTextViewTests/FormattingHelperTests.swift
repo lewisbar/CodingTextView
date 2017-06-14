@@ -627,26 +627,20 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+
+    func test_ClosedRoundBracketBeforeClosedRoundBracket_BehavesNormally_IfTooManyOpenBrackets() {
+        let text = "(bracket (test)"
+        let range = NSMakeRange(14, 0)   // Before closed bracket
+        let insertion = ")"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "(bracket (test))" // No bracket added
+        let expectedRange = NSMakeRange(15, 0) // Between the two closed brackets
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 //
-//    // MARK: - Closed Round Brackets
-//    func test_closedRoundBracketAfterNormalCharacter_TreatedNormally() {
-//        textView.text = "bracket (test"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode(")")
-//        
-//        XCTAssertEqual(textView.text, "bracket (test)") // Normal behavior
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
-//    func test_closedRoundBracketBeforeClosedRoundBracket_StepsOver() {
-//        textView.text = "bracket (test)"
-//        cursorOffsetFromEnd = -1
-//        textView.insertAsCode(")")
-//        
-//        XCTAssertEqual(textView.text, "bracket (test)") // No additional bracket
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
 //    func test_closedRoundBracketBeforeClosedRoundBracket_TreatedNormally_IfTooManyOpenBrackets() {
 //        textView.text = "(bracket (test)"
 //        cursorOffsetFromEnd = -1
