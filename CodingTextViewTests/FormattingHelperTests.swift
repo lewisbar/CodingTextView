@@ -12,8 +12,7 @@ import XCTest
 class FormattingHelperTests: XCTestCase {
     
     // TODO: Probably all tests need a version with whitespace, meaning they should still work if a space or - in some cases - tab is in between the relevant parts of the string
-    // MARK: - formattedText(for:in:range:)
-    // MARK: Normal Text
+    // MARK: - Normal Text
     func test_NormalCharacter_InsertedNormally() {
         let text = "test"
         let range = NSMakeRange(3, 0) // "t"
@@ -59,7 +58,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    // MARK: Backspace
+    // MARK: - Backspace
     func test_Backspace_DeletesPreviousCharacter() {
         let text = "test abc"
         let range = NSMakeRange(5, 1)   // Cursor after "a", so the range contains the "a"
@@ -86,7 +85,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    // MARK: New Line
+    // MARK: - New Line
     func test_NewLine_MaintainsIndentation() {
         let text =
             "\t\t" + "test"
@@ -641,10 +640,47 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
 
+    // TODO: Play warning sound when too many closed round brackets in the document
+    // MARK: - Closed Square Brackets
+    func test_ClosedSquareBracketAfterNormalCharacter_BehavesNormally() {
+        let text = "[test"
+        let range = NSMakeRange(5, 0)   // End
+        let insertion = "]"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
-//    // TODO: Play warning sound when too many closed round brackets in the document
-//    
-//    // MARK: - Closed Square Brackets
+        let expectedText = "[test]"
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedSquareBracketBeforeClosedSquareBracket_StepsOver() {
+        let text = "[test]"
+        let range = NSMakeRange(5, 0)   // Before closed bracket
+        let insertion = "]"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "[test]" // No bracket added
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedSquareBracketBeforeClosedSquareBracket_BehavesNormally_IfMoreOpenBrackets() {
+        let text = "[bracket [test]"
+        let range = NSMakeRange(14, 0)   // Before closed bracket
+        let insertion = "]"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "[bracket [test]]" // No bracket added
+        let expectedRange = NSMakeRange(15, 0) // Between the two closed brackets
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
 //    func test_closedSquareBracketAfterNormalCharacter_TreatedNormally() {
 //        textView.text = "bracket [test"
 //        cursorOffsetFromEnd = 0
