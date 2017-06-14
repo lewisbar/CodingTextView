@@ -75,25 +75,25 @@ struct FormattingHelper {
         let lineRange = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
         let line = text.substring(with: lineRange)
         let distilledLine = line.components(separatedBy: .whitespacesAndNewlines).joined()
-        let isSwitchLine: Bool = { return distilledLine.hasPrefix("switch") && distilledLine != "switch{" }()
+        let isValidSwitchLine: Bool = { return distilledLine.hasPrefix("switch") && distilledLine != "switch{" }()
         
         var scenario = Scenario.normal
         
         switch input {
         case "\n" where previousCharacter == "{" && nextCharacter == "}":
-            if isSwitchLine {
+            if isValidSwitchLine {
                 scenario = .newLineBetweenCurlyBracesAfterSwitch
             } else {
                 scenario = .newLineBetweenCurlyBraces
             }
         case "\n" where previousCharacter == "{" && text.number(of: "}") >= text.number(of: "{"):
-            if isSwitchLine {
+            if isValidSwitchLine {
                 scenario = .newLineAfterCurlyBraceAlreadyClosedAfterSwitch
             } else {
                 scenario = .newLineAfterCurlyBraceAlreadyClosed
             }
         case "\n" where previousCharacter == "{":
-            if isSwitchLine {
+            if isValidSwitchLine {
                 scenario = .newLineAfterCurlyBraceAfterSwitch
             } else {
                 scenario = .newLineAfterCurlyBrace
