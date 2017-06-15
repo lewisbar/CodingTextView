@@ -28,6 +28,21 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NormalCharacterBetweenWhiteSpace_InsertedNormally() {
+        let text = "tes\t  \tt"
+        let range = NSMakeRange(5, 0) // "t"
+        
+        let insertion = "a"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "tes\t a \tt"
+        let expectedRange = NSMakeRange(6, 0) // "t"
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NormalText_InsertedNormally() {
         let text = "test"
         let range = NSMakeRange(3, 0) // "t"
@@ -765,6 +780,15 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     // MARK: - Helper Tests
     // Helper methods should be made private once they pass the test (or at least at some point in the future)
