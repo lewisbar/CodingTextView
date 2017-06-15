@@ -148,6 +148,51 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NormalTextAtTheBeginning_ReplacesSelection() {
+        let text = "abc test test"
+        let range = NSMakeRange(0, 4) // "abc "
+        
+        let insertion = "..."
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "...test test"
+        let expectedRange = NSMakeRange(3, 0) // After "..."
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NormalTextAtTheEnd_ReplacesSelection() {
+        let text = "test test abc"
+        let range = NSMakeRange(9, 4) // " abc"
+        
+        let insertion = "er"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "test tester"
+        let expectedRange = NSMakeRange(11, 0) // End
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NormalTextInTheMiddleOfWhiteSpace_ReplacesSelection() {
+        let text = "test\t  abc  \ttest"
+        let range = NSMakeRange(6, 5) // " abc "
+        
+        let insertion = "..."
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "test\t ... \ttest"
+        let expectedRange = NSMakeRange(9, 0) // After "..."
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     // MARK: - Backspace
     func test_Backspace_DeletesPreviousCharacter() {
         let text = "test abc"
