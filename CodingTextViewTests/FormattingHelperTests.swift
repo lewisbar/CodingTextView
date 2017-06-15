@@ -28,15 +28,30 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NormalCharacterAtTheEnd_InsertedNormally() {
+        let text = "test"
+        let range = NSMakeRange(4, 0) // End
+        
+        let insertion = "a"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "testa"
+        let expectedRange = NSMakeRange(5, 0) // End
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NormalCharacterInTheMiddleOfWhiteSpace_InsertedNormally() {
         let text = "tes\t  \tt"
-        let range = NSMakeRange(5, 0) // "t"
+        let range = NSMakeRange(5, 0) // After the first space
         
         let insertion = "a"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText = "tes\t a \tt"
-        let expectedRange = NSMakeRange(6, 0) // "t"
+        let expectedRange = NSMakeRange(6, 0) // After the "a"
         
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -138,7 +153,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_newLine_BetweenCurlyBraces_UsesExistingBrace() {
+    func test_NewLine_BetweenCurlyBraces_UsesExistingBrace() {
         let text =
             "\t\t" + "test {}"
         let range = NSMakeRange(8, 0) // Closed brace
@@ -157,7 +172,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_newLine_AfterCurlyBrace_IndentsWithoutAddingClosedBrace_IfTooManyClosedBraces() {
+    func test_NewLine_AfterCurlyBrace_IndentsWithoutAddingClosedBrace_IfTooManyClosedBraces() {
         let text =
             "\t\t" + "test {" + "\n" +
             "another line }"
@@ -177,7 +192,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
 
-    func test_newLine_AfterCurlyBraceAfterSwitch_AddsClosedBraceWithoutIndenting() {
+    func test_NewLine_AfterCurlyBraceAfterSwitch_AddsClosedBraceWithoutIndenting() {
         let text =
             "\t\t" + "switch test {"
         let range = NSMakeRange(15, 0) // End
