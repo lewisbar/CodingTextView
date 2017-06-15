@@ -88,6 +88,51 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NormalTextAtTheBeginning_InsertedNormally() {
+        let text = "test"
+        let range = NSMakeRange(0, 0) // Beginning
+        
+        let insertion = "abc"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "abctest"
+        let expectedRange = NSMakeRange(3, 0) // After "abc"
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NormalTextAtTheEnd_InsertedNormally() {
+        let text = "test"
+        let range = NSMakeRange(4, 0) // End
+        
+        let insertion = "abc"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "testabc"
+        let expectedRange = NSMakeRange(7, 0) // End
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NormalTextInTheMiddleOfWhiteSpace_InsertedNormally() {
+        let text = "tes\t  \tt"
+        let range = NSMakeRange(5, 0) // Between the spaces
+        
+        let insertion = "abc"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "tes\t abc \tt"
+        let expectedRange = NSMakeRange(8, 0) // After "abc"
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NormalText_ReplacesSelection() {
         let text = "test abc test"
         let range = NSMakeRange(4, 4) // " abc"
