@@ -685,15 +685,42 @@ class FormattingHelperTests: XCTestCase {
     
     // MARK: - Closed Curly Braces
     func test_ClosedCurlyBraceAfterNormalCharacter_TreatedNormally() {
+        let text = "{test"
+        let range = NSMakeRange(5, 0)   // End
+        let insertion = "}"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
+        let expectedText = "{test}"
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_closedCurlyBraceBeforeClosedCurlyBrace_StepsOver() {
+    func test_ClosedCurlyBraceBeforeClosedCurlyBrace_StepsOver() {
+        let text = "{test}"
+        let range = NSMakeRange(5, 0)   // Before closed bracket
+        let insertion = "}"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
+        let expectedText = "{test}" // No bracket added
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_closedCurlyBraceBeforeClosedCurlyBrace_TreatedNormally_IfTooManyOpenBraces() {
+    func test_ClosedCurlyBraceBeforeClosedCurlyBrace_TreatedNormally_IfTooManyOpenBraces() {
+        let text = "{bracket {test}"
+        let range = NSMakeRange(14, 0)   // Before closed bracket
+        let insertion = "}"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
+        let expectedText = "{bracket {test}}" // No bracket added
+        let expectedRange = NSMakeRange(15, 0) // Between the two closed brackets
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
     
