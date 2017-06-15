@@ -641,6 +641,7 @@ class FormattingHelperTests: XCTestCase {
     }
 
     // TODO: Play warning sound when too many closed round brackets in the document
+    
     // MARK: - Closed Square Brackets
     func test_ClosedSquareBracketAfterNormalCharacter_TreatedNormally() {
         let text = "[test"
@@ -699,11 +700,11 @@ class FormattingHelperTests: XCTestCase {
     
     func test_ClosedCurlyBraceBeforeClosedCurlyBrace_StepsOver() {
         let text = "{test}"
-        let range = NSMakeRange(5, 0)   // Before closed bracket
+        let range = NSMakeRange(5, 0)   // Before closed brace
         let insertion = "}"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
-        let expectedText = "{test}" // No bracket added
+        let expectedText = "{test}" // No brace added
         let expectedRange = NSMakeRange(6, 0) // End
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -711,79 +712,59 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_ClosedCurlyBraceBeforeClosedCurlyBrace_TreatedNormally_IfTooManyOpenBraces() {
-        let text = "{bracket {test}"
-        let range = NSMakeRange(14, 0)   // Before closed bracket
+        let text = "{brace {test}"
+        let range = NSMakeRange(12, 0)   // Before closed bracket
         let insertion = "}"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
-        let expectedText = "{bracket {test}}" // No bracket added
-        let expectedRange = NSMakeRange(15, 0) // Between the two closed brackets
+        let expectedText = "{brace {test}}" // No brace added
+        let expectedRange = NSMakeRange(13, 0) // Between the two closed brackets
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+   
+    // TODO: Play warning sound when too many closed curly braces in the document
+    
+    // MARK: - Quotation Marks
+    func test_QuotationMark_CompletedByAnotherOne() {
+        let text = "test"
+        let range = NSMakeRange(4, 0)   // End
+        let insertion = "\""
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "test\"\""   // Two quotation marks added
+        let expectedRange = NSMakeRange(5, 0) // Between the quotes
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_QuotationMarkBeforeQuotationMark_StepsOver_IfEvenNumberOfQuotesInDocument() {
+        let text = "\"test\""
+        let range = NSMakeRange(5, 0)   // Before the second quotation mark
+        let insertion = "\""
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "\"test\"" // No quotation mark added
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
     
-    
-    
-    
-//    func test_closedCurlyBraceAfterNormalCharacter_TreatedNormally() {
-//        textView.text = "bracket {test"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("}")
-//        
-//        XCTAssertEqual(textView.text, "bracket {test}") // Normal behavior
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
-//    func test_closedCurlyBraceBeforeClosedCurlyBrace_StepsOver() {
-//        textView.text = "bracket {test}"
-//        cursorOffsetFromEnd = -1
-//        textView.insertAsCode("}")
-//        
-//        XCTAssertEqual(textView.text, "bracket {test}") // No additional bracket
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
-//    func test_closedCurlyBraceBeforeClosedCurlyBrace_TreatedNormally_IfTooManyOpenBraces() {
-//        textView.text = "{bracket {test}"
-//        cursorOffsetFromEnd = -1
-//        textView.insertAsCode("}")
-//        
-//        XCTAssertEqual(textView.text, "{bracket {test}}") // Normal behavior
-//        XCTAssertEqual(cursorOffsetFromEnd, -1)
-//    }
-//    
-//    // TODO: Play warning sound when too many closed curly braces in the document
-//    
-//    // MARK: - Quotation Marks
-//    func test_QuotationMark_CompletedByAnotherOne() {
-//        textView.text = "test "
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\"")
-//        
-//        XCTAssertEqual(textView.text, "test \"\"")  // One additional quotation mark
-//        XCTAssertEqual(cursorOffsetFromEnd, -1)     // Between the quotes
-//    }
-//    
-//    func test_QuotationMark_TreatedNormally_IfUnevenNumberOfQuotesInDocument() {
-//        textView.text = "\"test"
-//        cursorOffsetFromEnd = 0
-//        textView.insertAsCode("\"")
-//        
-//        XCTAssertEqual(textView.text, "\"test\"")   // No additional quotation mark
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-//    
-//    func test_QuotationMarkBeforeQuotationMark_StepsOver_IfEvenNumberOfQuotesInDocument() {
-//        textView.text = "\"test\""
-//        cursorOffsetFromEnd = -1    // After "test"
-//        textView.insertAsCode("\"")
-//        
-//        XCTAssertEqual(textView.text, "\"test\"")   // One additional quotation mark
-//        XCTAssertEqual(cursorOffsetFromEnd, 0)
-//    }
-
+    func test_QuotationMark_TreatedNormally_IfUnevenNumberOfQuotesInDocument() {
+        let text = "\"test"
+        let range = NSMakeRange(5, 0)   // End
+        let insertion = "\""
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "\"test\"" // No additional quotation mark
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
     
     // MARK: - Helper Tests
     // Helper methods should be made private once they pass the test (or at least at some point in the future)
