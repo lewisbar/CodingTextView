@@ -43,6 +43,21 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NormalCharacterAtTheBeginning_InsertedNormally() {
+        let text = "test"
+        let range = NSMakeRange(0, 0) // Beginning
+        
+        let insertion = "a"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "atest"
+        let expectedRange = NSMakeRange(1, 0) // After the "a"
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NormalCharacterInTheMiddleOfWhiteSpace_InsertedNormally() {
         let text = "tes\t  \tt"
         let range = NSMakeRange(5, 0) // After the first space
