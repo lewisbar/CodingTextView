@@ -375,7 +375,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     // MARK: - Colon
-    func test_ColonWithoutCaseOrDefault_BehavesNormally() {
+    func test_ColonWithoutCaseOrDefault_TreatedNormally() {
         let text = "\t\ttext"
         let range = NSMakeRange(6, 0) // End
         let insertion = ":"
@@ -388,7 +388,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonWithoutCaseOrDefault_WithSwitch_BehavesNormally() {
+    func test_ColonWithoutCaseOrDefault_WithSwitch_TreatedNormally() {
         let text =
             "\t\t" + "switch test {" + "\n" +
             "\t\t\t\t" + "test"
@@ -477,7 +477,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonAfterCaseWithoutSwitch_BehavesNormally() {
+    func test_ColonAfterCaseWithoutSwitch_TreatedNormally() {
         let text =
             "\t\t" + "test {" + "\n" +
             "\t\t\t\t" + "case test"
@@ -494,7 +494,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonAfterDefaultWithoutSwitch_BehavesNormally() {
+    func test_ColonAfterDefaultWithoutSwitch_TreatedNormally() {
         let text =
             "\t\t" + "test {" + "\n" +
             "\t\t\t\t" + "default"
@@ -511,7 +511,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonAfterCaseWithoutText_BehavesNormally() {
+    func test_ColonAfterCaseWithoutText_TreatedNormally() {
         let text =
             "\t\t" + "switch test {" + "\n" +
             "\t\t\t\t" + "case"
@@ -528,7 +528,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonAfterCaseWithoutText_WithTextInNextLine_BehavesNormally() {
+    func test_ColonAfterCaseWithoutText_WithTextInNextLine_TreatedNormally() {
         let text =
             "\t\t" + "switch test {" + "\n" +
             "\t\t\t\t" + "case" + "\n" +
@@ -601,7 +601,7 @@ class FormattingHelperTests: XCTestCase {
     }
 
     // MARK: - Closed Round Brackets
-    func test_ClosedRoundBracketAfterNormalCharacter_BehavesNormally() {
+    func test_ClosedRoundBracketAfterNormalCharacter_TreatedNormally() {
         let text = "(test"
         let range = NSMakeRange(5, 0)   // End
         let insertion = ")"
@@ -627,7 +627,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
 
-    func test_ClosedRoundBracketBeforeClosedRoundBracket_BehavesNormally_IfMoreOpenBrackets() {
+    func test_ClosedRoundBracketBeforeClosedRoundBracket_TreatedNormally_IfMoreOpenBrackets() {
         let text = "(bracket (test)"
         let range = NSMakeRange(14, 0)   // Before closed bracket
         let insertion = ")"
@@ -642,7 +642,7 @@ class FormattingHelperTests: XCTestCase {
 
     // TODO: Play warning sound when too many closed round brackets in the document
     // MARK: - Closed Square Brackets
-    func test_ClosedSquareBracketAfterNormalCharacter_BehavesNormally() {
+    func test_ClosedSquareBracketAfterNormalCharacter_TreatedNormally() {
         let text = "[test"
         let range = NSMakeRange(5, 0)   // End
         let insertion = "]"
@@ -668,7 +668,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ClosedSquareBracketBeforeClosedSquareBracket_BehavesNormally_IfMoreOpenBrackets() {
+    func test_ClosedSquareBracketBeforeClosedSquareBracket_TreatedNormally_IfMoreOpenBrackets() {
         let text = "[bracket [test]"
         let range = NSMakeRange(14, 0)   // Before closed bracket
         let insertion = "]"
@@ -684,7 +684,17 @@ class FormattingHelperTests: XCTestCase {
     // TODO: Play warning sound when too many closed square brackets in the document
     
     // MARK: - Closed Curly Braces
+    func test_ClosedCurlyBraceAfterNormalCharacter_TreatedNormally() {
+        
+    }
     
+    func test_closedCurlyBraceBeforeClosedCurlyBrace_StepsOver() {
+        
+    }
+    
+    func test_closedCurlyBraceBeforeClosedCurlyBrace_TreatedNormally_IfTooManyOpenBraces() {
+        
+    }
     
     
     
