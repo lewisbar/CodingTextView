@@ -28,7 +28,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalCharacterBetweenWhiteSpace_InsertedNormally() {
+    func test_NormalCharacterInTheMiddleOfWhiteSpace_InsertedNormally() {
         let text = "tes\t  \tt"
         let range = NSMakeRange(5, 0) // "t"
         
