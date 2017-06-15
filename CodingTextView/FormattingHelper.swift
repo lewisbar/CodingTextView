@@ -68,6 +68,7 @@ extension FormattingHelper {
         case openSquareBracket
         case closedRoundBracketBeforeClosedBracket
         case closedSquareBracketBeforeClosedBracket
+        case closedCurlyBraceBeforeClosedCurlyBrace
     }
     
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
@@ -135,6 +136,9 @@ extension FormattingHelper {
         case .closedSquareBracketBeforeClosedBracket:
             insertion = ""
             cursorOffset = input.characters.count
+        case .closedCurlyBraceBeforeClosedCurlyBrace:
+            insertion = ""
+            cursorOffset = input.characters.count
         }
         
         return (insertion, cursorOffset: cursorOffset)
@@ -186,6 +190,8 @@ extension FormattingHelper {
         case ")" where nextCharacter == ")" && (text.number(of: "(") <= text.number(of: ")")):
             scenario = .closedRoundBracketBeforeClosedBracket
         case "]" where nextCharacter == "]" && (text.number(of: "[") <= text.number(of: "]")):
+            scenario = .closedSquareBracketBeforeClosedBracket
+        case "}" where nextCharacter == "}" && (text.number(of: "{") <= text.number(of: "}")):
             scenario = .closedSquareBracketBeforeClosedBracket
         default:
             break
