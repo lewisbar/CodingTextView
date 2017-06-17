@@ -503,7 +503,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NewLine_BetweenCurlyBraces_InTheMiddleOfWhitespace_UsesExistingBrace() {
+    func test_NewLine_BetweenCurlyBraces_InTheMiddleOfWhitespace_TreatedNormally() {
         let text =
             "\t\t" + "test {\t  \t}"
         let range = NSMakeRange(10, 0) // Middle of whitespace
@@ -513,9 +513,8 @@ class FormattingHelperTests: XCTestCase {
         
         let expectedText =
             "\t\t" + "test {\t " + "\n" +
-            "\t\t\t" + "\n" +
-            "\t\t" + " \t}" // TODO: Is this how this strange case should be handled? It's just what happens.
-        let expectedRange = NSMakeRange(14, 0) // End of second line
+            "\t\t\t" + " \t}" // TODO: Is this how this strange case should be handled? It's just what happens.
+        let expectedRange = NSMakeRange(14, 0) // After the two leading tabs in the second line
         
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -1157,7 +1156,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonAfterCaseWithoutSwitch_TreatedNormally() {
+    func test_ColonAfterCase_WithoutSwitch_TreatedNormally() {
         let text =
             "\t\t" + "test {" + "\n" +
             "\t\t\t\t" + "case test"
@@ -1174,7 +1173,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonAfterDefaultWithoutSwitch_TreatedNormally() {
+    func test_ColonAfterDefault_WithoutSwitch_TreatedNormally() {
         let text =
             "\t\t" + "test {" + "\n" +
             "\t\t\t\t" + "default"
@@ -1191,7 +1190,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonAfterCaseWithoutText_TreatedNormally() {
+    func test_ColonAfterCase_WithoutText_TreatedNormally() {
         let text =
             "\t\t" + "switch test {" + "\n" +
             "\t\t\t\t" + "case"
@@ -1208,7 +1207,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ColonAfterCaseWithoutText_WithTextInNextLine_TreatedNormally() {
+    func test_ColonAfterCase_WithoutText_WithTextInNextLine_TreatedNormally() {
         let text =
             "\t\t" + "switch test {" + "\n" +
             "\t\t\t\t" + "case" + "\n" +
@@ -1281,7 +1280,7 @@ class FormattingHelperTests: XCTestCase {
     }
 
     // MARK: - Closed Round Brackets
-    func test_ClosedRoundBracketAfterNormalCharacter_TreatedNormally() {
+    func test_ClosedRoundBracket_AfterNormalCharacter_TreatedNormally() {
         let text = "(test"
         let range = NSMakeRange(5, 0)   // End
         let insertion = ")"
@@ -1294,7 +1293,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ClosedRoundBracketBeforeClosedRoundBracket_StepsOver() {
+    func test_ClosedRoundBracket_BeforeClosedRoundBracket_StepsOver() {
         let text = "(test)"
         let range = NSMakeRange(5, 0)   // Before closed bracket
         let insertion = ")"
@@ -1306,14 +1305,27 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+    
+    func test_ClosedRoundBracket_BeforeClosedRoundBracket_WithWhitespace_DoesNotStepOver() {
+        let text = "(test\t )"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = ")"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "(test)\t )" // Bracket added normally
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 
-    func test_ClosedRoundBracketBeforeClosedRoundBracket_TreatedNormally_IfMoreOpenBrackets() {
+    func test_ClosedRoundBracket_BeforeClosedRoundBracket_TreatedNormally_IfMoreOpenBrackets() {
         let text = "(bracket (test)"
         let range = NSMakeRange(14, 0)   // Before closed bracket
         let insertion = ")"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
-        let expectedText = "(bracket (test))" // No bracket added
+        let expectedText = "(bracket (test))" // Bracket added normally
         let expectedRange = NSMakeRange(15, 0) // Between the two closed brackets
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -1323,7 +1335,7 @@ class FormattingHelperTests: XCTestCase {
     // TODO: Play warning sound when too many closed round brackets in the document
     
     // MARK: - Closed Square Brackets
-    func test_ClosedSquareBracketAfterNormalCharacter_TreatedNormally() {
+    func test_ClosedSquareBracket_AfterNormalCharacter_TreatedNormally() {
         let text = "[test"
         let range = NSMakeRange(5, 0)   // End
         let insertion = "]"
@@ -1336,7 +1348,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ClosedSquareBracketBeforeClosedSquareBracket_StepsOver() {
+    func test_ClosedSquareBracket_BeforeClosedSquareBracket_StepsOver() {
         let text = "[test]"
         let range = NSMakeRange(5, 0)   // Before closed bracket
         let insertion = "]"
@@ -1349,7 +1361,20 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ClosedSquareBracketBeforeClosedSquareBracket_TreatedNormally_IfMoreOpenBrackets() {
+    func test_ClosedSquareBracket_BeforeClosedSquareBracket_WithWhitespace_DoesNotStepOver() {
+        let text = "[test\t ]"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "]"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "[test]\t ]" // Bracket added
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedSquareBracket_BeforeClosedSquareBracket_TreatedNormally_IfMoreOpenBrackets() {
         let text = "[bracket [test]"
         let range = NSMakeRange(14, 0)   // Before closed bracket
         let insertion = "]"
@@ -1365,7 +1390,7 @@ class FormattingHelperTests: XCTestCase {
     // TODO: Play warning sound when too many closed square brackets in the document
     
     // MARK: - Closed Curly Braces
-    func test_ClosedCurlyBraceAfterNormalCharacter_TreatedNormally() {
+    func test_ClosedCurlyBrace_AfterNormalCharacter_TreatedNormally() {
         let text = "{test"
         let range = NSMakeRange(5, 0)   // End
         let insertion = "}"
@@ -1378,7 +1403,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ClosedCurlyBraceBeforeClosedCurlyBrace_StepsOver() {
+    func test_ClosedCurlyBrace_BeforeClosedCurlyBrace_StepsOver() {
         let text = "{test}"
         let range = NSMakeRange(5, 0)   // Before closed brace
         let insertion = "}"
@@ -1391,7 +1416,20 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_ClosedCurlyBraceBeforeClosedCurlyBrace_TreatedNormally_IfTooManyOpenBraces() {
+    func test_ClosedCurlyBrace_BeforeClosedCurlyBrace_WithWhitespace_DoesNotStepOver() {
+        let text = "{test\t }"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "}"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "{test}\t }" // Brace added normally
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedCurlyBrace_BeforeClosedCurlyBrace_TreatedNormally_IfTooManyOpenBraces() {
         let text = "{brace {test}"
         let range = NSMakeRange(12, 0)   // Before closed bracket
         let insertion = "}"
@@ -1420,13 +1458,26 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_QuotationMarkBeforeQuotationMark_StepsOver_IfEvenNumberOfQuotesInDocument() {
+    func test_QuotationMark_BeforeQuotationMark_StepsOver_IfEvenNumberOfQuotesInDocument() {
         let text = "\"test\""
         let range = NSMakeRange(5, 0)   // Before the second quotation mark
         let insertion = "\""
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText = "\"test\"" // No quotation mark added
+        let expectedRange = NSMakeRange(6, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_QuotationMark_BeforeQuotationMark_WithWhitespace_CompletedByQuotationMark_IfEvenNumberOfQuotesInDocument() {
+        let text = "\"test\t \""
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "\""
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "\"test\"\"\t \"" // Quotation mark added normally
         let expectedRange = NSMakeRange(6, 0) // End
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
