@@ -1068,6 +1068,23 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_ColonAfterCase_WithWhitespace_AdoptsSwitchIndentation() {
+        let text =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t\t\t" + "case test\t "
+        let range = NSMakeRange(31, 0) // End
+        let insertion = ":"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {" + "\n" +
+                "\t\t" + "case test\t :"
+        let expectedRange = NSMakeRange(30, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_ColonAfterDefault_AdoptsSwitchIndentation() {
         let text =
             "\t\t" + "switch test {" + "\n" +
@@ -1080,6 +1097,23 @@ class FormattingHelperTests: XCTestCase {
             "\t\t" + "switch test {" + "\n" +
             "\t\t" + "default:"
         let expectedRange = NSMakeRange(26, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ColonAfterDefault_WithWhitespace_AdoptsSwitchIndentation() {
+        let text =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t\t\t" + "default\t "
+        let range = NSMakeRange(29, 0) // End
+        let insertion = ":"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {" + "\n" +
+            "\t\t" + "default\t :"
+        let expectedRange = NSMakeRange(28, 0) // End
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
