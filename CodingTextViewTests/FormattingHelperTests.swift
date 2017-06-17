@@ -896,7 +896,8 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_NewLine_AfterTextAfterColonAfterCase_NotIndented() {
-        let text = "\t\t" + "case test: test"
+        let text =
+            "\t\t" + "case test: test"
         let range = NSMakeRange(17, 0) // End
         let insertion = "\n"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
@@ -905,6 +906,22 @@ class FormattingHelperTests: XCTestCase {
             "\t\t" + "case test: test" + "\n" +
             "\t\t"
         let expectedRange = NSMakeRange(20, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterTextAfterColonAfterCase_WithWhitespace_NotIndented() {
+        let text =
+            "\t\t" + "case test: test\t "
+        let range = NSMakeRange(19, 0) // End
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "case test: test\t " + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(22, 0) // End
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
