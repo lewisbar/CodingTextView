@@ -257,7 +257,7 @@ extension String {
         
         while position != line.upperBound {
             let character = self.characters[position]
-            if character == "\t" { level += 1 }
+            if character == "\t" { level += 1 } else { break }
             position = index(after: position)
         }
         return level

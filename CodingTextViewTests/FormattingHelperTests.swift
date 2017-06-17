@@ -335,8 +335,7 @@ class FormattingHelperTests: XCTestCase {
     
     // MARK: - New Line
     func test_NewLine_MaintainsIndentation() {
-        let text =
-            "\t\t" + "test"
+        let text = "\t\t" + "test"
         let range = NSMakeRange(5, 0) // "t"
         
         let insertion = "\n"
@@ -352,9 +351,8 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NewLineAtTheBeginningOfLine_MaintainsIndentation() {
-        let text =
-            "\t\t" + "test"
+    func test_NewLineAtBeginningOfLine_MaintainsIndentation() {
+        let text = "\t\t" + "test"
         let range = NSMakeRange(2, 0) // After the tabs
         
         let insertion = "\n"
@@ -371,8 +369,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_NewLineAtTheEnd_MaintainsIndentation() {
-        let text =
-            "\t\t" + "test"
+        let text = "\t\t" + "test"
         let range = NSMakeRange(6, 0) // End
         
         let insertion = "\n"
@@ -380,7 +377,7 @@ class FormattingHelperTests: XCTestCase {
         
         let expectedText =
             "\t\t" + "test" + "\n" +
-        "\t\t"
+            "\t\t"
         let expectedRange = NSMakeRange(9, 0) // End
         
         XCTAssertEqual(newText, expectedText)
@@ -388,7 +385,22 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    // TODO: This is where I left off. NewLineInTheMiddleOfWhitesspace
+    func test_NewLineInTheMiddleOfWhitespace_MaintainsIndentation() {
+        let text = "\t\t" + "test\t  \t"
+        let range = NSMakeRange(8, 0) // In the middle of the spaces
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test\t " + "\n" +
+            "\t\t" + " \t"
+        let expectedRange = NSMakeRange(11, 0) // After the two tabs in the second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
     
     func test_NewLine_AfterCurlyBrace_IndentsAndAddsClosedBrace() {
         let text =
