@@ -203,7 +203,8 @@ class FormattingHelperTests: XCTestCase {
         let insertion = "er"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
-        let expectedText = "tester test"
+        let expectedText =
+            "tester test"
         let expectedRange = NSMakeRange(6, 0) // After "tester"
         
         XCTAssertEqual(newText, expectedText)
@@ -233,7 +234,8 @@ class FormattingHelperTests: XCTestCase {
         let insertion = ""
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
-        let expectedText = "test abc"
+        let expectedText =
+            "test abc"
         let expectedRange = NSMakeRange(5, 0)   // After the space
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -326,7 +328,8 @@ class FormattingHelperTests: XCTestCase {
         let insertion = ""
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
-        let expectedText = "test test"
+        let expectedText =
+            "test test"
         let expectedRange = NSMakeRange(5, 0)   // After the space
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -335,7 +338,8 @@ class FormattingHelperTests: XCTestCase {
     
     // MARK: - New Line
     func test_NewLine_MaintainsIndentation() {
-        let text = "\t\t" + "test"
+        let text =
+            "\t\t" + "test"
         let range = NSMakeRange(5, 0) // "t"
         
         let insertion = "\n"
@@ -352,7 +356,8 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_NewLine_AtBeginningOfLine_MaintainsIndentation() {
-        let text = "\t\t" + "test"
+        let text =
+            "\t\t" + "test"
         let range = NSMakeRange(2, 0) // After the tabs
         
         let insertion = "\n"
@@ -369,7 +374,8 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_NewLine_AtTheEnd_MaintainsIndentation() {
-        let text = "\t\t" + "test"
+        let text =
+            "\t\t" + "test"
         let range = NSMakeRange(6, 0) // End
         
         let insertion = "\n"
@@ -386,7 +392,8 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_NewLine_InTheMiddleOfWhitespace_MaintainsIndentation() {
-        let text = "\t\t" + "test\t  \t"
+        let text =
+            "\t\t" + "test\t  \t"
         let range = NSMakeRange(8, 0) // In the middle of the spaces
         
         let insertion = "\n"
@@ -479,8 +486,7 @@ class FormattingHelperTests: XCTestCase {
     }
     
     func test_NewLine_BetweenCurlyBraces_UsesExistingBrace() {
-        let text =
-            "\t\t" + "test {}"
+        let text = "\t\t" + "test {}"
         let range = NSMakeRange(8, 0) // Closed brace
         
         let insertion = "\n"
@@ -491,6 +497,44 @@ class FormattingHelperTests: XCTestCase {
             "\t\t\t" + "\n" +
             "\t\t" + "}"
         let expectedRange = NSMakeRange(12, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_BetweenCurlyBraces_InTheMiddleOfWhitespace_UsesExistingBrace() {
+        let text =
+            "\t\t" + "test {\t  \t}"
+        let range = NSMakeRange(10, 0) // Middle of whitespace
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test {\t " + "\n" +
+            "\t\t\t" + "\n" +
+            "\t\t" + " \t}" // TODO: Is this how this strange case should be handled? It's just what happens.
+        let expectedRange = NSMakeRange(14, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_BetweenCurlyBraces_AfterWhitespace_UsesExistingBrace() {
+        let text =
+            "\t\t" + "test {\t }"
+        let range = NSMakeRange(10, 0) // Closed brace
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test {\t " + "\n" +
+                "\t\t\t" + "\n" +
+                "\t\t" + "}"
+        let expectedRange = NSMakeRange(14, 0) // End of second line
         
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
