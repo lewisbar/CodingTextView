@@ -28,7 +28,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalCharacterAtTheEnd_InsertedNormally() {
+    func test_NormalCharacter_AtTheEnd_InsertedNormally() {
         let text = "test"
         let range = NSMakeRange(4, 0) // End
         
@@ -43,7 +43,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalCharacterAtTheBeginning_InsertedNormally() {
+    func test_NormalCharacter_AtTheBeginning_InsertedNormally() {
         let text = "test"
         let range = NSMakeRange(0, 0) // Beginning
         
@@ -58,7 +58,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalCharacterInTheMiddleOfWhitespace_InsertedNormally() {
+    func test_NormalCharacter_InTheMiddleOfWhitespace_InsertedNormally() {
         let text = "tes\t  \tt"
         let range = NSMakeRange(5, 0) // After the first space
         
@@ -88,7 +88,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalTextAtTheBeginning_InsertedNormally() {
+    func test_NormalText_AtTheBeginning_InsertedNormally() {
         let text = "test"
         let range = NSMakeRange(0, 0) // Beginning
         
@@ -103,7 +103,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalTextAtTheEnd_InsertedNormally() {
+    func test_NormalText_AtTheEnd_InsertedNormally() {
         let text = "test"
         let range = NSMakeRange(4, 0) // End
         
@@ -118,7 +118,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalTextInTheMiddleOfWhitespace_InsertedNormally() {
+    func test_NormalText_InTheMiddleOfWhitespace_InsertedNormally() {
         let text = "tes\t  \tt"
         let range = NSMakeRange(5, 0) // Between the spaces
         
@@ -148,7 +148,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalTextAtTheBeginning_ReplacesSelection() {
+    func test_NormalText_AtTheBeginning_ReplacesSelection() {
         let text = "abc test test"
         let range = NSMakeRange(0, 4) // "abc "
         
@@ -163,7 +163,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalTextAtTheEnd_ReplacesSelection() {
+    func test_NormalText_AtTheEnd_ReplacesSelection() {
         let text = "test test abc"
         let range = NSMakeRange(9, 4) // " abc"
         
@@ -178,7 +178,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalTextInTheMiddleOfWhitespace_ReplacesSelection() {
+    func test_NormalText_InTheMiddleOfWhitespace_ReplacesSelection() {
         let text = "test\t  abc  \ttest"
         let range = NSMakeRange(6, 5) // " abc "
         
@@ -193,11 +193,11 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NormalText_ReplacesSelectionAcrossMultipleLines() {
+    func test_NormalText_ReplacesSelection_AcrossMultipleLines() {
         let text =
             "test" + "\n" +
-                "abc" + "\n" +
-        "abc test"
+            "abc" + "\n" +
+            "abc test"
         let range = NSMakeRange(4, 8) // "\nabc\nabc"
         
         let insertion = "er"
@@ -225,7 +225,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_BackspaceAtStartOfLine_DeletesNewLine() {
+    func test_Backspace_AtStartOfLine_DeletesNewLine() {
         let text =
             "test " + "\n" +
             "abc"
@@ -240,7 +240,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_BackspaceAtTheEnd_DeletesPreviousCharacter() {
+    func test_Backspace_AtTheEnd_DeletesPreviousCharacter() {
         let text = "test abc"
         let range = NSMakeRange(7, 1)   // "c"
         let insertion = ""
@@ -253,7 +253,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_BackspaceInTheMiddleOfWhitespace_DeletesPreviousWhitespace() {
+    func test_Backspace_InTheMiddleOfWhitespace_DeletesPreviousWhitespace() {
         let text = "test \t  \tabc"
         let range = NSMakeRange(6, 1)   // Whitespace after first tab
         let insertion = ""
@@ -266,7 +266,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_BackspaceWhileTextIsSelected_DeletesSelectedText() {
+    func test_Backspace_WhileTextIsSelected_DeletesSelectedText() {
         let text = "test abc"
         let range = NSMakeRange(5, 2)   // "ab"
         let insertion = ""
@@ -279,7 +279,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_BackspaceWhileTextIsSelectedAtTheBeginning_DeletesSelectedText() {
+    func test_Backspace_WhileTextIsSelected_AtTheBeginning_DeletesSelectedText() {
         let text = "abc test"
         let range = NSMakeRange(0, 4)   // "abc "
         let insertion = ""
@@ -292,7 +292,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_BackspaceWhileTextIsSelectedAtTheEnd_DeletesSelectedText() {
+    func test_Backspace_WhileTextIsSelected_AtTheEnd_DeletesSelectedText() {
         let text = "test abc"
         let range = NSMakeRange(4, 4)   // " abc"
         let insertion = ""
@@ -305,7 +305,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_BackspaceWhileTextIsSelectedInTheMiddleOfWhitespace_DeletesSelectedText() {
+    func test_Backspace_WhileTextIsSelected_InTheMiddleOfWhitespace_DeletesSelectedText() {
         let text = "test\t  abc \ttest"
         let range = NSMakeRange(6, 5)   // " abc "
         let insertion = ""
@@ -318,7 +318,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_BackspaceWhileTextIsSelectedAcrossMultipleLines_DeletesSelectedText() {
+    func test_Backspace_WhileTextIsSelected_AcrossMultipleLines_DeletesSelectedText() {
         let text =
             "test abc" + "\n" +
             "abc test"
@@ -351,7 +351,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NewLineAtBeginningOfLine_MaintainsIndentation() {
+    func test_NewLine_AtBeginningOfLine_MaintainsIndentation() {
         let text = "\t\t" + "test"
         let range = NSMakeRange(2, 0) // After the tabs
         
@@ -368,7 +368,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NewLineAtTheEnd_MaintainsIndentation() {
+    func test_NewLine_AtTheEnd_MaintainsIndentation() {
         let text = "\t\t" + "test"
         let range = NSMakeRange(6, 0) // End
         
@@ -385,7 +385,7 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
-    func test_NewLineInTheMiddleOfWhitespace_MaintainsIndentation() {
+    func test_NewLine_InTheMiddleOfWhitespace_MaintainsIndentation() {
         let text = "\t\t" + "test\t  \t"
         let range = NSMakeRange(8, 0) // In the middle of the spaces
         
@@ -404,6 +404,44 @@ class FormattingHelperTests: XCTestCase {
     
     func test_NewLine_AfterCurlyBrace_IndentsAndAddsClosedBrace() {
         let text =
+            "\t\t" + "test {abc"
+        let range = NSMakeRange(8, 0) // Before "abc"
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test {" + "\n" +
+            "\t\t\t" + "\n" +
+            "\t\t" + "}abc"
+        let expectedRange = NSMakeRange(12, 0) // After the tabs in the second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterCurlyBrace_AtTheBeginning_IndentsAndAddsClosedBrace() {
+        let text =
+            "{abc"
+        let range = NSMakeRange(1, 0) // Before "abc"
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "{" + "\n" +
+            "\t" + "\n" +
+            "}abc"
+        let expectedRange = NSMakeRange(3, 0) // After the tab in the second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterCurlyBrace_AtTheEnd_IndentsAndAddsClosedBrace() {
+        let text =
             "\t\t" + "test {"
         let range = NSMakeRange(8, 0) // End
         
@@ -415,6 +453,25 @@ class FormattingHelperTests: XCTestCase {
             "\t\t\t" + "\n" +
             "\t\t" + "}"
         let expectedRange = NSMakeRange(12, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterCurlyBrace_InTheMiddleOfWhitespace_IndentsAndAddsClosedBrace() {
+        let text =
+            "\t\t" + "test {\t  \t"
+        let range = NSMakeRange(10, 0) // In the middle of the whitespace
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test {\t " + "\n" +
+            "\t\t\t" + "\n" +
+            "\t\t" + "} \t"
+        let expectedRange = NSMakeRange(14, 0) // After the tabs in the second line
         
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
