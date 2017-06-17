@@ -10,8 +10,7 @@ import XCTest
 @testable import CodingTextView
 
 class FormattingHelperTests: XCTestCase {
-    
-    // TODO: Probably all tests need a version with whitespace, meaning they should still work if a space or - in some cases - tab is in between the relevant parts of the string
+
     // MARK: - Normal Text
     func test_NormalCharacter_InsertedNormally() {
         let text = "test"
@@ -1506,158 +1505,161 @@ class FormattingHelperTests: XCTestCase {
     
     
     
-    // MARK: - Helper Tests
-    // Helper methods should be made private once they pass the test (or at least at some point in the future)
-    // These tests must then be deleted or commented out
-    // CompletedInput
-    func test_CompletedInput_Normal() {
-        let (insertion, offset) = FormattingHelper.completedInput(for: "abc", scenario: .normal, indentation: 2)
-        let expectedInsertion = "abc"
-        let expectedOffset = 3
-        XCTAssertEqual(expectedInsertion, insertion)
-        XCTAssertEqual(expectedOffset, offset)
-    }
-    
-    func test_CompletedInput_NewLine() {
-        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLine, indentation: 2)
-        let expectedInsertion = "\n\t\t"
-        let expectedOffset = 3
-        XCTAssertEqual(expectedInsertion, insertion)
-        XCTAssertEqual(expectedOffset, offset)
-    }
-    
-    func test_CompletedInput_NewLineAfterCurlyBrace() {
-        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLineAfterCurlyBrace, indentation: 2)
-        let expectedInsertion = "\n\t\t\t\n\t\t}"
-        let expectedOffset = 4
-        XCTAssertEqual(expectedInsertion, insertion)
-        XCTAssertEqual(expectedOffset, offset)
-    }
-    
-    func test_CompletedInput_NewLineAfterCurlyBraceAlreadyClosed() {
-        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLineAfterCurlyBraceAlreadyClosed, indentation: 2)
-        let expectedInsertion = "\n\t\t\t"
-        let expectedOffset = 4
-        XCTAssertEqual(expectedInsertion, insertion)
-        XCTAssertEqual(expectedOffset, offset)
-    }
-    
-    // Other Helpers
-    func test_StringRangeFromRange() {
-        let text = "0123456789"
-        let range = NSMakeRange(1, 2)   // 1 and 2
-        guard let stringRange = text.stringRange(from: range) else {
-            XCTFail("stringRange should not be nil")
-            return
-        }
-        let selectedText = text.substring(with: stringRange)
-        XCTAssertEqual(selectedText, "12")
-    }
-    
-    func test_RangeOfClosestTextBeforePosition() {
-        let text = "0123...4567...89...0"
-        let position = text.index(text.startIndex, offsetBy: 15)  // Between 8 and 9
-        
-        let range = text.range(ofClosest: "...", before: position)
-        
-        let expectedStart = text.index(text.startIndex, offsetBy: 11)
-        let expectedEnd = text.index(expectedStart, offsetBy: 3)
-        
-        XCTAssertEqual(range?.lowerBound, expectedStart)
-        XCTAssertEqual(range?.upperBound, expectedEnd)
-    }
-    
-    func test_RangeOfClosestTextAfterPosition() {
-        let text = "0123...4567...89...0"
-        let position = text.index(text.startIndex, offsetBy: 8)  // Between 4 and 5
-        
-        let range = text.range(ofClosest: "...", after: position)
-        
-        let expectedStart = text.index(text.startIndex, offsetBy: 11)
-        let expectedEnd = text.index(expectedStart, offsetBy: 3)
-        
-        XCTAssertEqual(range?.lowerBound, expectedStart)
-        XCTAssertEqual(range?.upperBound, expectedEnd)
-    }
-    
-    func test_Tabs() {
-        let tabs = String.tabs(for: 3)
-        XCTAssertEqual(tabs, "\t\t\t")
-    }
-    
-    func test_CharacterBefore() {
-        let text = "ab c"
-        let position = text.index(text.startIndex, offsetBy: 3)  // Before c
-        let character = text.character(before: position, ignoring: [" "])
-        let expectedCharacter: Character = "b"
-        XCTAssertEqual(expectedCharacter, character!)
-    }
-    
-    func test_CharacterBeforeStart_ReturnsNil() {
-        let text = "abc"
-        let character = text.character(before: text.startIndex)
-        XCTAssertNil(character)
-    }
-    
-    func test_CharacterAt() {
-        let text = "ab c"
-        let position = text.index(text.startIndex, offsetBy: 2)  // After b
-        let character = text.character(at: position, ignoring: [" "])
-        let expectedCharacter: Character = "c"
-        XCTAssertEqual(expectedCharacter, character)
-    }
-    
-    func test_CharacterAtEnd_ReturnsNil() {
-        let text = "abc"
-        let position = text.index(text.startIndex, offsetBy: 3)  // After c
-        let character = text.character(at: position)
-        XCTAssertNil(character)
-    }
-    
-    func test_NumberOfStringInRange() {
-        let text = "ab..cdef..ghi..jkl..mnop...qrs."
-        let range = text.startIndex..<text.endIndex
-        let number = text.number(of: "..", in: range)
-        let expectedNumber = 5
-        XCTAssertEqual(expectedNumber, number)
-    }
-    
-    func test_RemovingIndentation() {
-        let text =
-            "\t" + "line 1" + "\n" +
-            "\t\t\t" + "line 2"
-        let line2Start = text.index(text.startIndex, offsetBy: 8)
-        let line2Range = line2Start..<text.endIndex
-        let newText = text.removingIndentation(of: line2Range)
-        let expectedText =
-            "\t" + "line 1" + "\n" +
-            "line 2"
-        XCTAssertEqual(newText, expectedText)
-    }
-    
-    func test_SettingIndentationLevel_CanIncreaseIndentation() {
-        let text =
-            "\t" + "line 1" + "\n" +
-            "\t" + "line 2"
-        let line2Start = text.index(text.startIndex, offsetBy: 8)
-        let line2Range = line2Start..<text.endIndex
-        let newText = text.settingIndentationLevel(of: line2Range, to: 3)
-        let expectedText =
-            "\t" + "line 1" + "\n" +
-            "\t\t\t" + "line 2"
-        XCTAssertEqual(newText, expectedText)
-    }
-    
-    func test_SettingIndentationLevel_CanDecreaseIndentation() {
-        let text =
-            "\t" + "line 1" + "\n" +
-            "\t\t\t" + "line 2"
-        let line2Start = text.index(text.startIndex, offsetBy: 8)
-        let line2Range = line2Start..<text.endIndex
-        let newText = text.settingIndentationLevel(of: line2Range, to: 1)
-        let expectedText =
-            "\t" + "line 1" + "\n" +
-            "\t" + "line 2"
-        XCTAssertEqual(newText, expectedText)
-    }
+//    // MARK: - Helper Tests
+//    // Helper methods should be made private once they pass the test (or at least at some point in the future).
+//    // These tests must then be deleted or commented out.
+//    // These tests don't cover the helper methods completely, but are just a product of the process.
+//    // Still, they could become useful again when working on the helper methods.
+//    // CompletedInput
+//    func test_CompletedInput_Normal() {
+//        let (insertion, offset) = FormattingHelper.completedInput(for: "abc", scenario: .normal, indentation: 2)
+//        let expectedInsertion = "abc"
+//        let expectedOffset = 3
+//        XCTAssertEqual(expectedInsertion, insertion)
+//        XCTAssertEqual(expectedOffset, offset)
+//    }
+//
+//    func test_CompletedInput_NewLine() {
+//        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLine, indentation: 2)
+//        let expectedInsertion = "\n\t\t"
+//        let expectedOffset = 3
+//        XCTAssertEqual(expectedInsertion, insertion)
+//        XCTAssertEqual(expectedOffset, offset)
+//    }
+//
+//    func test_CompletedInput_NewLineAfterCurlyBrace() {
+//        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLineAfterCurlyBrace, indentation: 2)
+//        let expectedInsertion = "\n\t\t\t\n\t\t}"
+//        let expectedOffset = 4
+//        XCTAssertEqual(expectedInsertion, insertion)
+//        XCTAssertEqual(expectedOffset, offset)
+//    }
+//
+//    func test_CompletedInput_NewLineAfterCurlyBraceAlreadyClosed() {
+//        let (insertion, offset) = FormattingHelper.completedInput(for: "\n", scenario: .newLineAfterCurlyBraceAlreadyClosed, indentation: 2)
+//        let expectedInsertion = "\n\t\t\t"
+//        let expectedOffset = 4
+//        XCTAssertEqual(expectedInsertion, insertion)
+//        XCTAssertEqual(expectedOffset, offset)
+//    }
+//
+//    // Other Helpers
+//    func test_StringRangeFromRange() {
+//        let text = "0123456789"
+//        let range = NSMakeRange(1, 2)   // 1 and 2
+//        guard let stringRange = text.stringRange(from: range) else {
+//            XCTFail("stringRange should not be nil")
+//            return
+//        }
+//        let selectedText = text.substring(with: stringRange)
+//        XCTAssertEqual(selectedText, "12")
+//    }
+//
+//    func test_RangeOfClosestTextBeforePosition() {
+//        let text = "0123...4567...89...0"
+//        let position = text.index(text.startIndex, offsetBy: 15)  // Between 8 and 9
+//
+//        let range = text.range(ofClosest: "...", before: position)
+//
+//        let expectedStart = text.index(text.startIndex, offsetBy: 11)
+//        let expectedEnd = text.index(expectedStart, offsetBy: 3)
+//
+//        XCTAssertEqual(range?.lowerBound, expectedStart)
+//        XCTAssertEqual(range?.upperBound, expectedEnd)
+//    }
+//
+//    func test_RangeOfClosestTextAfterPosition() {
+//        let text = "0123...4567...89...0"
+//        let position = text.index(text.startIndex, offsetBy: 8)  // Between 4 and 5
+//
+//        let range = text.range(ofClosest: "...", after: position)
+//
+//        let expectedStart = text.index(text.startIndex, offsetBy: 11)
+//        let expectedEnd = text.index(expectedStart, offsetBy: 3)
+//
+//        XCTAssertEqual(range?.lowerBound, expectedStart)
+//        XCTAssertEqual(range?.upperBound, expectedEnd)
+//    }
+//
+//    func test_Tabs() {
+//        let tabs = String.tabs(for: 3)
+//        XCTAssertEqual(tabs, "\t\t\t")
+//    }
+//
+//    func test_CharacterBefore() {
+//        let text = "ab c"
+//        let position = text.index(text.startIndex, offsetBy: 3)  // Before c
+//        let character = text.character(before: position, ignoring: [" "])
+//        let expectedCharacter: Character = "b"
+//        XCTAssertEqual(expectedCharacter, character!)
+//    }
+//
+//    func test_CharacterBeforeStart_ReturnsNil() {
+//        let text = "abc"
+//        let character = text.character(before: text.startIndex)
+//        XCTAssertNil(character)
+//    }
+//
+//    func test_CharacterAt() {
+//        let text = "ab c"
+//        let position = text.index(text.startIndex, offsetBy: 2)  // After b
+//        let character = text.character(at: position, ignoring: [" "])
+//        let expectedCharacter: Character = "c"
+//        XCTAssertEqual(expectedCharacter, character)
+//    }
+//
+//    func test_CharacterAtEnd_ReturnsNil() {
+//        let text = "abc"
+//        let position = text.index(text.startIndex, offsetBy: 3)  // After c
+//        let character = text.character(at: position)
+//        XCTAssertNil(character)
+//    }
+//
+//    func test_NumberOfStringInRange() {
+//        let text = "ab..cdef..ghi..jkl..mnop...qrs."
+//        let range = text.startIndex..<text.endIndex
+//        let number = text.number(of: "..", in: range)
+//        let expectedNumber = 5
+//        XCTAssertEqual(expectedNumber, number)
+//    }
+//
+//    func test_RemovingIndentation() {
+//        let text =
+//            "\t" + "line 1" + "\n" +
+//            "\t\t\t" + "line 2"
+//        let line2Start = text.index(text.startIndex, offsetBy: 8)
+//        let line2Range = line2Start..<text.endIndex
+//        let newText = text.removingIndentation(of: line2Range)
+//        let expectedText =
+//            "\t" + "line 1" + "\n" +
+//            "line 2"
+//        XCTAssertEqual(newText, expectedText)
+//    }
+//
+//    func test_SettingIndentationLevel_CanIncreaseIndentation() {
+//        let text =
+//            "\t" + "line 1" + "\n" +
+//            "\t" + "line 2"
+//        let line2Start = text.index(text.startIndex, offsetBy: 8)
+//        let line2Range = line2Start..<text.endIndex
+//        let newText = text.settingIndentationLevel(of: line2Range, to: 3)
+//        let expectedText =
+//            "\t" + "line 1" + "\n" +
+//            "\t\t\t" + "line 2"
+//        XCTAssertEqual(newText, expectedText)
+//    }
+//
+//    func test_SettingIndentationLevel_CanDecreaseIndentation() {
+//        let text =
+//            "\t" + "line 1" + "\n" +
+//            "\t\t\t" + "line 2"
+//        let line2Start = text.index(text.startIndex, offsetBy: 8)
+//        let line2Range = line2Start..<text.endIndex
+//        let newText = text.settingIndentationLevel(of: line2Range, to: 1)
+//        let expectedText =
+//            "\t" + "line 1" + "\n" +
+//            "\t" + "line 2"
+//        XCTAssertEqual(newText, expectedText)
+//    }
 }
+

@@ -51,8 +51,7 @@ struct FormattingHelper {
 }
 
 // MARK: Private Implementation
-// TODO: Mark as private
-extension FormattingHelper {
+private extension FormattingHelper {
     enum Scenario {
         case normal
         case newLine
