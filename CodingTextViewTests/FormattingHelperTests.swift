@@ -560,6 +560,26 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+    
+    func test_NewLine_AfterCurlyBrace_WithWhitespace_IndentsWithoutAddingClosedBrace_IfTooManyClosedBraces() {
+        let text =
+            "\t\t" + "test {\t " + "\n" +
+            "another line }"
+        let range = NSMakeRange(10, 0) // End of first line
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test {\t " + "\n" +
+            "\t\t\t" + "\n" +
+            "another line }"
+        let expectedRange = NSMakeRange(14, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 
     func test_NewLine_AfterCurlyBraceAfterSwitch_AddsClosedBraceWithoutIndenting() {
         let text =
@@ -580,6 +600,25 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterCurlyBraceAfterSwitch_WithWhiteSpace_AddsClosedBraceWithoutIndenting() {
+        let text =
+            "\t\t" + "switch test {\t "
+        let range = NSMakeRange(17, 0) // End
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {\t " + "\n" +
+                "\t\t" + "\n" +
+                "\t\t" + "}"
+        let expectedRange = NSMakeRange(20, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_BetweenCurlyBracesAfterSwitch_UsesExistingCurlyBraceWithoutIndenting() {
         let text =
             "\t\t" + "switch test {}"
@@ -593,6 +632,25 @@ class FormattingHelperTests: XCTestCase {
             "\t\t" + "\n" +
             "\t\t" + "}"
         let expectedRange = NSMakeRange(18, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_BetweenCurlyBracesAfterSwitch_WithWhitespace_UsesExistingCurlyBraceWithoutIndenting() {
+        let text =
+            "\t\t" + "switch test {\t }"
+        let range = NSMakeRange(17, 0) // Closed brace
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {\t " + "\n" +
+            "\t\t" + "\n" +
+            "\t\t" + "}"
+        let expectedRange = NSMakeRange(20, 0) // End of second line
         
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
@@ -619,6 +677,26 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterCurlyBraceAfterSwitch_WithWhitespace_NoBraceOrIndentationAdded_IfTooManyClosedBraces() {
+        let text =
+            "\t\t" + "switch test {\t " + "\n" +
+            "another line }"
+        let range = NSMakeRange(17, 0) // After open curly brace
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {\t " + "\n" +
+            "\t\t" + "\n" +
+            "another line }"
+        let expectedRange = NSMakeRange(20, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterCurlyBraceAfterSwitchWithoutText_IgnoresSwitch() {
         let text =
             "\t\t" + "switch {"
@@ -638,8 +716,28 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterCurlyBraceAfterSwitchWithoutText_WithWhitespace_IgnoresSwitch() {
+        let text =
+            "\t\t" + "switch {\t "
+        let range = NSMakeRange(12, 0) // End
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch {\t " + "\n" +
+            "\t\t\t" + "\n" +
+            "\t\t" + "}"
+        let expectedRange = NSMakeRange(16, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterColon_NotIndented() {
-        let text = "\t\t" + "test:"
+        let text =
+            "\t\t" + "test:"
         let range = NSMakeRange(7, 0) // After colon
         let insertion = "\n"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
@@ -653,8 +751,25 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterColon_WithWhitespace_NotIndented() {
+        let text =
+            "\t\t" + "test:\t "
+        let range = NSMakeRange(9, 0) // After colon
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "test:\t " + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(12, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterCaseWithoutColon_NotIndented() {
-        let text = "\t\t" + "case test"
+        let text =
+            "\t\t" + "case test"
         let range = NSMakeRange(11, 0) // End
         let insertion = "\n"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
@@ -668,8 +783,25 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterCaseWithoutColon_WithWhitespace_NotIndented() {
+        let text =
+            "\t\t" + "case test\t "
+        let range = NSMakeRange(13, 0) // End
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "case test\t " + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(16, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterDefaultWithoutColon_NotIndented() {
-        let text = "\t\t" + "default"
+        let text =
+            "\t\t" + "default"
         let range = NSMakeRange(9, 0) // End
         let insertion = "\n"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
@@ -683,8 +815,25 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterDefaultWithoutColon_WithWhitespace_NotIndented() {
+        let text =
+            "\t\t" + "default\t "
+        let range = NSMakeRange(11, 0) // End
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "default\t " + "\n" +
+            "\t\t"
+        let expectedRange = NSMakeRange(14, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterColonAfterCase_Indents() {
-        let text = "\t\t" + "case test:"
+        let text =
+            "\t\t" + "case test:"
         let range = NSMakeRange(12, 0) // After colon
         let insertion = "\n"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
@@ -698,8 +847,25 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterColonAfterCase_WithWhitespace_Indents() {
+        let text =
+            "\t\t" + "case test:\t "
+        let range = NSMakeRange(14, 0) // After colon
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "case test:\t " + "\n" +
+            "\t\t\t"
+        let expectedRange = NSMakeRange(18, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_AfterColonAfterDefault_Indents() {
-        let text = "\t\t" + "default:"
+        let text =
+            "\t\t" + "default:"
         let range = NSMakeRange(10, 0) // After colon
         let insertion = "\n"
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
@@ -708,6 +874,22 @@ class FormattingHelperTests: XCTestCase {
             "\t\t" + "default:" + "\n" +
             "\t\t\t"
         let expectedRange = NSMakeRange(14, 0) // End
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterColonAfterDefault_WithWhitespace_Indents() {
+        let text =
+            "\t\t" + "default:\t "
+        let range = NSMakeRange(12, 0) // After colon
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "default:\t " + "\n" +
+            "\t\t\t"
+        let expectedRange = NSMakeRange(16, 0) // End
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
