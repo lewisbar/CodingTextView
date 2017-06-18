@@ -155,7 +155,7 @@ private extension FormattingHelper {
         guard let selection = text.stringRange(from: range) else { return nil }
         
         let previousCharacter = text.character(before: selection.lowerBound, ignoring: [" ", "\t"])
-        let nextCharacter = text.character(at: selection.lowerBound, ignoring: [" "])
+        let nextCharacter = text.character(at: selection.lowerBound)
         
         let lineRange = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
         let line = text.substring(with: lineRange)
