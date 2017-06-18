@@ -2022,7 +2022,33 @@ class FormattingHelperTests: XCTestCase {
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText = "\"test\"\"\t \"" // Quotation mark added normally
-        let expectedRange = NSMakeRange(6, 0) // End
+        let expectedRange = NSMakeRange(6, 0) // After the second quotation mark
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_QuotationMark_BeforeQuotationMark_WithTab_CompletedByQuotationMark_IfEvenNumberOfQuotesInDocument() {
+        let text = "\"test\t\""
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "\""
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "\"test\"\"\t\"" // Quotation mark added normally
+        let expectedRange = NSMakeRange(6, 0) // After the second quotation mark
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_QuotationMark_BeforeQuotationMark_WithSpace_CompletedByQuotationMark_IfEvenNumberOfQuotesInDocument() {
+        let text = "\"test \""
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "\""
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "\"test\"\" \"" // Quotation mark added normally
+        let expectedRange = NSMakeRange(6, 0) // After the second quotation mark
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
