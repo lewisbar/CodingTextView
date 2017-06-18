@@ -834,6 +834,44 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_NewLine_AfterCurlyBraceAfterSwitch_WithTab_AddsClosedBraceWithoutIndenting() {
+        let text =
+            "\t\t" + "switch test {\t"
+        let range = NSMakeRange(16, 0) // End
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test {\t" + "\n" +
+                "\t\t" + "\n" +
+                "\t\t" + "}"
+        let expectedRange = NSMakeRange(19, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_NewLine_AfterCurlyBraceAfterSwitch_WithSpace_AddsClosedBraceWithoutIndenting() {
+        let text =
+            "\t\t" + "switch test { "
+        let range = NSMakeRange(16, 0) // End
+        
+        let insertion = "\n"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText =
+            "\t\t" + "switch test { " + "\n" +
+                "\t\t" + "\n" +
+                "\t\t" + "}"
+        let expectedRange = NSMakeRange(19, 0) // End of second line
+        
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_NewLine_BetweenCurlyBracesAfterSwitch_UsesExistingCurlyBraceWithoutIndenting() {
         let text =
             "\t\t" + "switch test {}"
