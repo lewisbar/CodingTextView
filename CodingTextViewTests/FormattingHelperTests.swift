@@ -1784,6 +1784,32 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.location, expectedRange.location)
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
+    
+    func test_ClosedRoundBracket_BeforeClosedRoundBracket_WithTab_DoesNotStepOver() {
+        let text = "(test\t)"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = ")"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "(test)\t)" // Bracket added normally
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedRoundBracket_BeforeClosedRoundBracket_WithSpace_DoesNotStepOver() {
+        let text = "(test )"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = ")"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "(test) )" // Bracket added normally
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
 
     func test_ClosedRoundBracket_BeforeClosedRoundBracket_TreatedNormally_IfMoreOpenBrackets() {
         let text = "(bracket (test)"
@@ -1840,6 +1866,32 @@ class FormattingHelperTests: XCTestCase {
         XCTAssertEqual(newRange.length, expectedRange.length)
     }
     
+    func test_ClosedSquareBracket_BeforeClosedSquareBracket_WithTab_DoesNotStepOver() {
+        let text = "[test\t]"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "]"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "[test]\t]" // Bracket added
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedSquareBracket_BeforeClosedSquareBracket_WithSpace_DoesNotStepOver() {
+        let text = "[test ]"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "]"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "[test] ]" // Bracket added
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
     func test_ClosedSquareBracket_BeforeClosedSquareBracket_TreatedNormally_IfMoreOpenBrackets() {
         let text = "[bracket [test]"
         let range = NSMakeRange(14, 0)   // Before closed bracket
@@ -1889,6 +1941,32 @@ class FormattingHelperTests: XCTestCase {
         let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
         
         let expectedText = "{test}\t }" // Brace added normally
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedCurlyBrace_BeforeClosedCurlyBrace_WithTab_DoesNotStepOver() {
+        let text = "{test\t}"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "}"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "{test}\t}" // Brace added normally
+        let expectedRange = NSMakeRange(6, 0) // After new bracket
+        XCTAssertEqual(newText, expectedText)
+        XCTAssertEqual(newRange.location, expectedRange.location)
+        XCTAssertEqual(newRange.length, expectedRange.length)
+    }
+    
+    func test_ClosedCurlyBrace_BeforeClosedCurlyBrace_WithSpace_DoesNotStepOver() {
+        let text = "{test }"
+        let range = NSMakeRange(5, 0)   // After "test"
+        let insertion = "}"
+        let (newText, newRange) = FormattingHelper.formattedText(for: insertion, in: text, range: range)
+        
+        let expectedText = "{test} }" // Brace added normally
         let expectedRange = NSMakeRange(6, 0) // After new bracket
         XCTAssertEqual(newText, expectedText)
         XCTAssertEqual(newRange.location, expectedRange.location)
