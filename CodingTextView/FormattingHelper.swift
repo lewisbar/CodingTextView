@@ -74,78 +74,78 @@ private extension FormattingHelper {
     
     static func completedInput(for input: String, scenario: Scenario, indentation: Int) -> (String, cursorOffset: Int) {
         var insertion = input
-        var cursorOffset = input.characters.count
+        var cursorOffset = input.count
         
         switch scenario {
         case .normal:
             insertion = input
-            cursorOffset = insertion.characters.count
+            cursorOffset = insertion.count
         case .newLine:
             let completion = String.tabs(for: indentation)
             insertion = input + completion
-            cursorOffset = insertion.characters.count
+            cursorOffset = insertion.count
         case .newLineAfterCurlyBrace:
             var completion = String.tabs(for: indentation + 1)
             completion += "\n"
             completion += String.tabs(for: indentation)
             completion += "}"
             insertion = input + completion
-            cursorOffset = input.characters.count + indentation + 1
+            cursorOffset = input.count + indentation + 1
         case .newLineBetweenCurlyBraces:
             var completion = String.tabs(for: indentation + 1)
             completion += "\n"
             completion += String.tabs(for: indentation)
             insertion = input + completion
-            cursorOffset = input.characters.count + indentation + 1
+            cursorOffset = input.count + indentation + 1
         case .newLineAfterCurlyBraceAlreadyClosed:
             let completion = String.tabs(for: indentation + 1)
             insertion = input + completion
-            cursorOffset = insertion.characters.count
+            cursorOffset = insertion.count
         case .newLineAfterCurlyBraceAfterSwitch:
             var completion = String.tabs(for: indentation)
             completion += "\n"
             completion += String.tabs(for: indentation)
             completion += "}"
             insertion = input + completion
-            cursorOffset = input.characters.count + indentation
+            cursorOffset = input.count + indentation
         case .newLineBetweenCurlyBracesAfterSwitch:
             var completion = String.tabs(for: indentation)
             completion += "\n"
             completion += String.tabs(for: indentation)
             insertion = input + completion
-            cursorOffset = input.characters.count + indentation
+            cursorOffset = input.count + indentation
         case .newLineAfterCurlyBraceAlreadyClosedAfterSwitch:
             let completion = String.tabs(for: indentation)
             insertion = input + completion
-            cursorOffset = insertion.characters.count
+            cursorOffset = insertion.count
         case .newLineAfterColonAfterCaseOrDefault:
             let completion = String.tabs(for: indentation + 1)
             insertion = input + completion
-            cursorOffset = insertion.characters.count
+            cursorOffset = insertion.count
         case .colonAfterCaseOrDefault:
             insertion = input
-            cursorOffset = insertion.characters.count
+            cursorOffset = insertion.count
         case .openRoundBracket:
             insertion = input + ")"
-            cursorOffset = input.characters.count
+            cursorOffset = input.count
         case .openSquareBracket:
             insertion = input + "]"
-            cursorOffset = input.characters.count
+            cursorOffset = input.count
         case .closedRoundBracketBeforeClosedBracket:
             insertion = ""
-            cursorOffset = input.characters.count
+            cursorOffset = input.count
         case .closedSquareBracketBeforeClosedBracket:
             insertion = ""
-            cursorOffset = input.characters.count
+            cursorOffset = input.count
         case .closedCurlyBraceBeforeClosedCurlyBrace:
             insertion = ""
-            cursorOffset = input.characters.count
+            cursorOffset = input.count
         case .quotationMark:
             insertion = input + "\""
-            cursorOffset = input.characters.count
+            cursorOffset = input.count
         case .quotationMarkBeforeQuotationMark:
             insertion = ""
-            cursorOffset = input.characters.count
+            cursorOffset = input.count
         }
         
         return (insertion, cursorOffset: cursorOffset)
@@ -216,14 +216,14 @@ private extension FormattingHelper {
 extension String {
 
     func stringRange(from range: NSRange) -> Range<String.Index>? {
-        guard (range.location + range.length) <= characters.count else { return nil }
+        guard (range.location + range.length) <= count else { return nil }
         let start = self.index(self.startIndex, offsetBy: range.location)
         let end = self.index(start, offsetBy: range.length)
         return start..<end
     }
     
     func range(ofClosest text: String, before position: String.Index) -> Range<String.Index>? {
-        guard var startOfRange = self.index(position, offsetBy: -text.characters.count, limitedBy: startIndex) else { return nil }
+        guard var startOfRange = self.index(position, offsetBy: -text.count, limitedBy: startIndex) else { return nil }
         var endOfRange = position
 
         while true {
@@ -237,7 +237,7 @@ extension String {
     }
     
     func range(ofClosest text: String, after position: String.Index) -> Range<String.Index>? {
-        guard var endOfRange = self.index(position, offsetBy: text.characters.count, limitedBy: endIndex) else { return nil }
+        guard var endOfRange = self.index(position, offsetBy: text.count, limitedBy: endIndex) else { return nil }
         var startOfRange = position
         
         while true {
@@ -255,7 +255,7 @@ extension String {
         var position = line.lowerBound
         
         while position != line.upperBound {
-            let character = self.characters[position]
+            let character = self[position]
             if character == "\t" { level += 1 } else { break }
             position = index(after: position)
         }
@@ -279,7 +279,7 @@ extension String {
     func settingIndentationLevel(of line: Range<String.Index>, to level: Int) -> String {
         var newText = self.removingIndentation(of: line)
         let tabs = String.tabs(for: level)
-        newText.insert(contentsOf: tabs.characters, at: line.lowerBound)
+        newText.insert(contentsOf: tabs, at: line.lowerBound)
         return newText
     }
     
@@ -287,8 +287,8 @@ extension String {
         var position = position
         
         while position < endIndex {
-            if !ignoring.contains(characters[position]) {
-                return characters[position]
+            if !ignoring.contains(self[position]) {
+                return self[position]
             }
             position = index(after: position)
         }
@@ -300,8 +300,8 @@ extension String {
         
         while position > startIndex {
             position = index(before: position)
-            if !ignoring.contains(characters[position]) {
-                return characters[position]
+            if !ignoring.contains(self[position]) {
+                return self[position]
             }
         }
         return nil
