@@ -158,7 +158,7 @@ private extension FormattingHelper {
         let nextCharacter = text.character(at: selection.lowerBound)
         
         let lineRange = text.lineRange(for: selection.lowerBound..<selection.lowerBound)
-        let line = text.substring(with: lineRange)
+        let line = text[lineRange]
         let distilledLine = line.components(separatedBy: .whitespacesAndNewlines).joined()
         let isValidSwitchLine: Bool = { return distilledLine.hasPrefix("switch") && distilledLine != "switch{" }()
         
@@ -228,7 +228,7 @@ extension String {
 
         while true {
             let range = startOfRange..<endOfRange
-            let candidate = substring(with: range)
+            let candidate = self[range]
             if candidate == text { return range }
             guard let newStart = self.index(startOfRange, offsetBy: -1, limitedBy: startIndex) else { return nil }
             startOfRange = newStart
@@ -242,7 +242,7 @@ extension String {
         
         while true {
             let range = startOfRange..<endOfRange
-            let candidate = substring(with: range)
+            let candidate = self[range]
             if candidate == text { return range }
             guard let newEnd = self.index(endOfRange, offsetBy: 1, limitedBy: endIndex) else { return nil }
             endOfRange = newEnd
